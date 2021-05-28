@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <?xml version="1.0" encoding="utf-8"?>
+    <string name="app_name">SEG 2105 Term Project</string>
     <string name="test">Hello World!</string>
 </resources>
