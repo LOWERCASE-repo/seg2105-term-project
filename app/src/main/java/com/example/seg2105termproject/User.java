@@ -1,6 +1,6 @@
 package com.example.seg2105termproject;
 
-public class User {
+public abstract class User {
 
     private String username;
     private String password;
@@ -37,4 +37,6 @@ public class User {
     public boolean signIn(String username, String password){
         throw new UnsupportedOperationException();
     }
+
+    public abstract String getType();
 }
