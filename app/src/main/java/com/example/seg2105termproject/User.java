@@ -38,5 +38,5 @@ public abstract class User {
         throw new UnsupportedOperationException();
     }
 
-    public abstract String getType();
+    public abstract UserType getType();
 }

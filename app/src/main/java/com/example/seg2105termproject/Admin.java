@@ -1,6 +1,14 @@
 package com.example.seg2105termproject;
 
-public class Admin {
+public class Admin extends User{
+
+    public Admin (String username, String password){
+        super(username, password);
+    }
+
+    public UserType getType(){
+        return UserType.ADMIN;
+    }
 
     // Placeholders for now:
     // boolean return type could be replaced with exceptions and proper handling.
