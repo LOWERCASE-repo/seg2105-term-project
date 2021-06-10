@@ -77,15 +77,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-
     /**
-     * Add a User object into the Accounts table of the database.
-     * @param user  A User object to insert into the database.
+     * Add a User Object into the User_Accounts table of the database.
+     * @param user      A User object to insert into the database.
+     * @throws IllegalArgumentException     Thrown if the user param shares a username
+     *                                      with an already-existing user.
      */
-    public void addUser (User user){
+    public void addUser (User user) throws IllegalArgumentException{
 
         // Get reference to writable database (opens it?).
         SQLiteDatabase db = this.getWritableDatabase();
+
+        // Check if the username is already in use.
+
+        // Instance the SQL query to get the entry (User) with the passed username.
+        String query = "SELECT * FROM " + Accounts.TABLE_NAME +
+                " WHERE " + Accounts.COLUMN_USERNAME +
+                " = \"" + user.getUsername() + "\"";
+
+        // Construct the Cursor object with the "raw" query.
+        Cursor cursor = db.rawQuery(query, null);
+
+        // Check if the cursor can find a user with the username.
+        if (cursor.moveToFirst()){
+            throw new IllegalArgumentException("User already exists.");
+        }
 
         // Put values of User object into container object.
         ContentValues values = new ContentValues();
@@ -103,8 +119,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /**
      * Add a Course object into the CourseTable table of the database.
      * @param course    A Course object to insert into the database.
+     * @exception IllegalArgumentException      Thrown if the course param shares a course code
+     *                                          with an already-existing course.
      */
-    public void addCourse (Course course){
+    public void addCourse (Course course) throws IllegalArgumentException{
 
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
@@ -236,7 +254,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Instance the SQL query to get the entry (User) with the passed username.
         String query = "SELECT * FROM " + Accounts.TABLE_NAME +
-                "WHERE " + Accounts.COLUMN_USERNAME +
+                " WHERE " + Accounts.COLUMN_USERNAME +
                 " = \"" + username + "\"";
 
         // Construct the Cursor object with the "raw" query.
@@ -309,7 +327,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Instance the SQL query to get the entry (Course) with the passed course code.
         String query = "SELECT * FROM " + CourseTable.TABLE_NAME +
-                "WHERE " + CourseTable.COLUMN_COURSE_CODE +
+                " WHERE " + CourseTable.COLUMN_COURSE_CODE +
                 " = \"" + courseCode + "\"";
 
         // Construct the Cursor object with the "raw" query.
