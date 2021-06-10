@@ -5,6 +5,10 @@
       <config />
     </shared>
   </component>
+  <component name="AndroidLogFilters">
+    <option name="TOOL_WINDOW_LOG_LEVEL" value="verbose" />
+    <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
+  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="NONE" />
   </component>
@@ -27,7 +31,9 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="57bee9d9-4b3d-4be4-809a-78c4f933fd4a" name="Default Changelist" comment="" />
+    <list default="true" id="57bee9d9-4b3d-4be4-809a-78c4f933fd4a" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -39,6 +45,34 @@
       <ProjectState />
     </projectState>
   </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="SEG 2105 Term Project" type="f1a62948:ProjectNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="SEG 2105 Term Project" type="f1a62948:ProjectNode" />
+                <item name="app" type="2d1252cf:ModuleNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="SEG 2105 Term Project" type="f1a62948:ProjectNode" />
+                <item name="app" type="2d1252cf:ModuleNode" />
+                <item name="Dependencies" type="6de06a37:ExternalSystemViewDefaultContributor$MyDependenciesNode" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -47,6 +81,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1tAl3iYxxPdza1hGkklSZFvxB22" />
@@ -59,7 +98,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Lab3" />
   </component>
   <component name="RunManager">
     <configuration default="true" type="AndroidJUnit" factoryName="Android JUnit">
@@ -149,5 +188,32 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="484" y="66" key="FileChooserDialogImpl" timestamp="1622820662411">
+      <screen x="82" y="0" width="1454" height="864" />
+    </state>
+    <state x="484" y="66" key="FileChooserDialogImpl/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1622820662411" />
+    <state width="1387" height="192" key="GridCell.Tab.0.bottom" timestamp="1623366183779">
+      <screen x="82" y="0" width="1454" height="864" />
+    </state>
+    <state width="1387" height="192" key="GridCell.Tab.0.bottom/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623366183779" />
+    <state width="1387" height="192" key="GridCell.Tab.0.center" timestamp="1623366183779">
+      <screen x="82" y="0" width="1454" height="864" />
+    </state>
+    <state width="1387" height="192" key="GridCell.Tab.0.center/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623366183779" />
+    <state width="1387" height="192" key="GridCell.Tab.0.left" timestamp="1623366183778">
+      <screen x="82" y="0" width="1454" height="864" />
+    </state>
+    <state width="1387" height="192" key="GridCell.Tab.0.left/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623366183778" />
+    <state width="1387" height="192" key="GridCell.Tab.0.right" timestamp="1623366183779">
+      <screen x="82" y="0" width="1454" height="864" />
+    </state>
+    <state width="1387" height="192" key="GridCell.Tab.0.right/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623366183779" />
+    <state x="328" y="2" key="git4idea.branch.GitSmartOperationDialog" timestamp="1623366088410">
+      <screen x="82" y="0" width="1454" height="864" />
+    </state>
+    <state x="328" y="2" key="git4idea.branch.GitSmartOperationDialog/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623366088410" />
   </component>
 </project>
