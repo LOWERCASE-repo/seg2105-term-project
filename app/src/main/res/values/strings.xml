@@ -1,5 +1,48 @@
 <resources>
-    <?xml version="1.0" encoding="utf-8"?>
     <string name="app_name">SEG 2105 Term Project</string>
-    <string name="test">Hello World!</string>
+
+    <!-- Standard string resources for types of users. -->
+    <string name="admin">Admin</string>
+    <string name="instructor">Instructor</string>
+    <string name="student">Student</string>
+
+    <!-- For Sign Up/In page. -->
+    <string name="type_of_user">Type of User:</string>
+    <string name="username_label">Username:</string>
+    <string name="password_label">Password:</string>
+    <string name="repeat_pw_label">Repeat Password:</string>
+
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_in">Sign In</string>
+
+    <!-- For admin activity and associated dialogs. -->
+    <string name="create_course">Create Course</string>
+    <string name="edit_course_name">Edit Course Name</string>
+    <string name="edit_course_code">Edit Course Code</string>
+    <string name="delete_course">Delete Course</string>
+
+    <string name="delete_user">Delete User</string>
+
+    <string name="course_name_label">Course Name:</string>
+    <string name="course_code_label">Course Code:</string>
+
+
+
+    <!-- Basic keywords for admins. -->
+    <string name="create">Create</string>
+    <string name="delete">Delete</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Error messages. -->
+    <string name="error">Error</string>
+    <string name="missing_fields">Required fields missing.</string>
+    <string name="repeat_incorrect">Passwords do not match.</string>
+    <string name="user_not_found">That user does not exist.</string>
+    <string name="user_already_exists">That username is already being used.</string>
+    <string name="password_incorrect">Incorrect password.</string>
+    <string name="course_already_exists">That course code is already in use.</string>
+
+    <string name="success">Success</string>
+
 </resources>
