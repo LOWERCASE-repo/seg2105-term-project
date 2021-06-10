@@ -266,40 +266,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // If the User was found,
         if (cursor.moveToFirst()){
 
-            // Get the type of User saved in the database.
-            UserType type = UserType.valueOf(cursor.getString(1));
-
-            // Switch-case statement on the UserType.
-            // Construct the corresponding User subclass.
-            switch (type){
-                case ADMIN:
-                    user = new Admin(
-                            cursor.getString(2),
-                            cursor.getString(3)
-                    );
-                    break;
-
-                case INSTRUCTOR:
-                    user = new Instructor(
-                            cursor.getString(2),
-                            cursor.getString(3)
-                    );
-                    break;
-
-                case STUDENT:
-                    user = new Student(
-                            cursor.getString(2),
-                            cursor.getString(3)
-                    );
-                    break;
-
-                default:
-                    // Only runs if the type saved is not a valid type,
-                    // therefore meaning an error has occurred if this runs.
-
-                    // Any better exception suggestions?
-                    throw new IllegalStateException("Stored User has does not have valid typing");
-            }
+            // Construct and get the reference to the appropriate user subclass.
+            user = constructUserSubclass(cursor);
 
         } else {
             // If the object is not found, set to null.
@@ -341,6 +309,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             // Construct the course object.
             course = new Course(
+                    cursor.getInt(0),
                     cursor.getString(1),
                     cursor.getString(2)
             );
@@ -356,5 +325,113 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Return the Course (or null if not found).
         return course;
+    }
+
+    public User[] getAllUsers(){
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT * FROM " + Accounts.TABLE_NAME;
+        Cursor cursor = db.rawQuery(query, null);
+
+        User[] users;
+        if (cursor.moveToFirst()){
+            int i = 0;
+            users = new User[cursor.getCount()];
+
+            do {
+                users[i++] = constructUserSubclass(cursor);
+
+            } while (cursor.moveToNext());
+
+        } else {
+            users = new User[0];
+        }
+
+        cursor.close();
+        db.close();
+        return users;
+    }
+
+    public Course[] getAllCourses(){
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT * FROM " + Accounts.TABLE_NAME;
+        Cursor cursor = db.rawQuery(query, null);
+
+        Course[] courses;
+        if (cursor.moveToFirst()){
+            int i = 0;
+            courses = new Course[cursor.getCount()];
+
+            do {
+                courses[i++] = new Course(
+                        Integer.parseInt(cursor.getString(0)),
+                        cursor.getString(1),
+                        cursor.getString(2)
+                );
+
+            } while (cursor.moveToNext());
+
+        } else {
+            courses = new Course[0];
+        }
+
+        cursor.close();
+        db.close();
+        return courses;
+    }
+
+    /**
+     * Constructs and returns the reference to the User subclass object the passed cursor
+     * object is pointing at.
+     * @param cursor    The cursor object that currently points at the desired user in the
+     *                  database.
+     * @return  The reference to the User subclass object that the cursor is pointing at.
+     */
+    private User constructUserSubclass(Cursor cursor){
+
+        // Declare the user variable.
+        User user;
+
+        // Get the type of User saved in the database.
+        UserType type = UserType.valueOf(cursor.getString(1));
+
+        // Switch-case statement on the UserType.
+        // Construct the corresponding User subclass.
+        switch (type){
+            case ADMIN:
+                user = new Admin(
+                        cursor.getInt(0),
+                        cursor.getString(2),
+                        cursor.getString(3)
+                );
+                break;
+
+            case INSTRUCTOR:
+                user = new Instructor(
+                        cursor.getInt(0),
+                        cursor.getString(2),
+                        cursor.getString(3)
+                );
+                break;
+
+            case STUDENT:
+                user = new Student(
+                        cursor.getInt(0),
+                        cursor.getString(2),
+                        cursor.getString(3)
+                );
+                break;
+
+            default:
+                // Only runs if the type saved is not a valid type,
+                // therefore meaning an error has occurred if this runs.
+
+                // Any better exception suggestions?
+                throw new IllegalStateException("Stored User has does not have valid typing");
+        }
+
+        // Return the instantiated user subclass.
+        return user;
     }
 }

@@ -104,23 +104,27 @@ public class MainActivity extends AppCompatActivity {
 
             if (password.equals(desiredUser.getPassword())){
 
+                Intent intent = null;
                 switch (desiredUser.getType()){
                     case ADMIN:
-                        // Load admin activity.
-                        Intent intent = new Intent(this, AdminActivity.class);
-                        intent.putExtra(EXTRA_USER, username);
-                        startActivity(intent);
+                        // Load admin activity in intent object.
+                        intent = new Intent(this, AdminActivity.class);
                         break;
                     case INSTRUCTOR:
-                        // Load instructor activity.
+                        // Load instructor activity in intent object.
+                        intent = new Intent(this, InstructorActivity.class);
                         break;
                     case STUDENT:
-                        // Load student activity.
-                        break;
-                    default:
-                        // Unexpected error: invalid user type.
+                        // Load student activity in intent object.
+                        intent = new Intent(this, StudentActivity.class);
                         break;
                 }
+
+                // Send the username through to the activity.
+                intent.putExtra(EXTRA_USER, username);
+
+                // Start the user activity.
+                startActivity(intent);
 
             } else {
                 // Error message: password incorrect.
