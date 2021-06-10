@@ -34,6 +34,8 @@
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
 
+    <string name="welcome">Welcome</string>
+
     <!-- Error messages. -->
     <string name="error">Error</string>
     <string name="missing_fields">Required fields missing.</string>
