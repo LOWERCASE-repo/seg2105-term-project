@@ -8,6 +8,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -15,18 +16,19 @@ import android.widget.TextView;
 
 public class AdminActivity extends AppCompatActivity {
 
-    private class CreateCourseFragment extends DialogFragment{
+    // What I have right now doesn't work. Feel free to completely change this.
+    public static class CreateCourseFragment extends DialogFragment{
 
         @Override
         public Dialog onCreateDialog (Bundle savedInstanceState) {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//            LayoutInflater inflater = requireActivity().getLayoutInflater();
+            LayoutInflater inflater = requireActivity().getLayoutInflater();
 
-            EditText editCName = findViewById(R.id.editCNameCreate);
-            EditText editCCode = findViewById(R.id.editCCodeCreate);
+            EditText editCName = this.getActivity().findViewById(R.id.editCNameCreate);
+            EditText editCCode = this.getActivity().findViewById(R.id.editCCodeCreate);
 
-            builder.setView(R.layout.create_course_dialog)
+            builder.setView(inflater.inflate(R.layout.create_course_dialog, null))
                     .setTitle(R.string.create_course)
                     .setPositiveButton(R.string.create, (dialog, which) -> {
                         String courseName = editCName.getText().toString();
@@ -51,6 +53,9 @@ public class AdminActivity extends AppCompatActivity {
     TextView tvAdminName;
     RecyclerView CoursesView, UsersView;
 
+    CoursesViewAdapter cAdapter;
+    UsersViewAdapter uAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +67,9 @@ public class AdminActivity extends AppCompatActivity {
         UsersView = findViewById(R.id.UsersView);
 
         DatabaseHelper dbHelper = new DatabaseHelper(this);
+        cAdapter = new CoursesViewAdapter(dbHelper.getAllCourses());
+        uAdapter = new UsersViewAdapter(dbHelper.getAllUsers());
+
         Intent intent = getIntent();
         admin = (Admin) dbHelper.getUser(intent.getStringExtra(MainActivity.EXTRA_USER));
 
@@ -71,6 +79,13 @@ public class AdminActivity extends AppCompatActivity {
     public void createCourse(View view){
         CreateCourseFragment ccFragment = new CreateCourseFragment();
         ccFragment.show(getSupportFragmentManager(), "create_course");
+        refreshViews();
+    }
+
+    private void refreshViews() {
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        cAdapter.refresh(dbHelper.getAllCourses());
+        uAdapter.refresh(dbHelper.getAllUsers());
     }
 
 
