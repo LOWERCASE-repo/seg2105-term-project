@@ -161,7 +161,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Instance the SQL query to get the entry (User) with the passed username.
         String query = "SELECT * FROM " + Accounts.TABLE_NAME +
-                "WHERE " + Accounts.COLUMN_USERNAME +
+                " WHERE " + Accounts.COLUMN_USERNAME +
                 " = \"" + username + "\"";
 
         // Construct the Cursor object with the "raw" query.

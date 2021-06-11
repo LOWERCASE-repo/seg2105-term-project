@@ -178,6 +178,70 @@ public class AdminActivity extends AppCompatActivity {
         refreshViews();
     }
 
+    public void deleteCourse(View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Delete Course");
+        final EditText code = new EditText(this);
+        code.setHint("Code");
+        builder.setView(code);
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String courseCode = code.getText().toString();
+                DatabaseHelper dbHelper = new DatabaseHelper(self);
+                try {
+                    if (!dbHelper.deleteCourse(courseCode)) {
+                        Utils.createErrorDialog(self, R.string.course_not_found);
+                    }
+                } catch (IllegalArgumentException e) {
+                    Utils.createErrorDialog(self, R.string.course_not_found);
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+        refreshViews();
+    }
+
+
+    public void deleteUser(View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Delete User");
+        final EditText name = new EditText(this);
+        name.setHint("Username");
+        builder.setView(name);
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String username = name.getText().toString();
+                DatabaseHelper dbHelper = new DatabaseHelper(self);
+                try {
+                    User user = dbHelper.getUser(username);
+                    if (!dbHelper.deleteUser(username)) {
+                        Utils.createErrorDialog(self, R.string.user_not_found);
+                    }
+                } catch (IllegalArgumentException e) {
+                    Utils.createErrorDialog(self, R.string.course_not_found);
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+        refreshViews();
+    }
+
     private void refreshViews() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         cAdapter.refresh(dbHelper.getAllCourses());

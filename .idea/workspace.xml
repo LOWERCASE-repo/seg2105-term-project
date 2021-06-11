@@ -38,12 +38,11 @@
     </select>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="57bee9d9-4b3d-4be4-809a-78c4f933fd4a" name="Default Changelist" comment="aight course creation is go">
+    <list default="true" id="57bee9d9-4b3d-4be4-809a-78c4f933fd4a" name="Default Changelist" comment="edit course code and edit course name are workin">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/AdminActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/AdminActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/DatabaseHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/DatabaseHelper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_admin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_admin.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -204,7 +203,14 @@
       <option name="project" value="LOCAL" />
       <updated>1623371359860</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="edit course code and edit course name are workin">
+      <created>1623374529655</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1623374529655</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -239,7 +245,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="merged from main" />
     <MESSAGE value="buff alert dialogue working" />
-    <option name="LAST_COMMIT_MESSAGE" value="buff alert dialogue working" />
+    <MESSAGE value="edit course code and edit course name are workin" />
+    <option name="LAST_COMMIT_MESSAGE" value="edit course code and edit course name are workin" />
   </component>
   <component name="WindowStateProjectService">
     <state x="175" y="93" width="1268" height="678" key="AVDManager" timestamp="1623367962255">
@@ -290,5 +297,9 @@
       <screen x="82" y="0" width="1454" height="864" />
     </state>
     <state x="328" y="2" key="git4idea.branch.GitSmartOperationDialog/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623366983965" />
+    <state x="298" y="188" key="run.anything.popup" timestamp="1623374744633">
+      <screen x="82" y="0" width="1454" height="864" />
+    </state>
+    <state x="298" y="188" key="run.anything.popup/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623374744633" />
   </component>
 </project>
