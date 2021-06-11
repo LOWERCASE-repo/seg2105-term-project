@@ -70,18 +70,28 @@ public class AdminActivity extends AppCompatActivity {
         cAdapter = new CoursesViewAdapter(dbHelper.getAllCourses());
         uAdapter = new UsersViewAdapter(dbHelper.getAllUsers());
 
+        CoursesView.setAdapter(cAdapter);
+        UsersView.setAdapter(uAdapter);
+
         Intent intent = getIntent();
         admin = (Admin) dbHelper.getUser(intent.getStringExtra(MainActivity.EXTRA_USER));
 
         tvAdminName.setText("Welcome " + admin.getUsername());
     }
 
+    /**
+     * Method for the onClick of btnCreateCourse.
+     * @param view  The view that calls the method.
+     */
     public void createCourse(View view){
         CreateCourseFragment ccFragment = new CreateCourseFragment();
         ccFragment.show(getSupportFragmentManager(), "create_course");
         refreshViews();
     }
 
+    /**
+     * Refreshes the RecyclerViews with the latest User and Course data.
+     */
     private void refreshViews() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         cAdapter.refresh(dbHelper.getAllCourses());

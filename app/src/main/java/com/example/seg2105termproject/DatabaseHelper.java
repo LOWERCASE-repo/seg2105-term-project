@@ -327,6 +327,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return course;
     }
 
+    /**
+     * Instantiates and returns the reference to an array containing all Users in the database.
+     * @return  An array containing all Users in the database.
+     */
     public User[] getAllUsers(){
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -352,6 +356,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return users;
     }
 
+    /**
+     * Instantiates and returns the reference to an array containing all Courses in the database.
+     * @return  An array containing all Courses in the database.
+     */
     public Course[] getAllCourses(){
         SQLiteDatabase db = this.getReadableDatabase();
 
