@@ -16,6 +16,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class AdminActivity extends AppCompatActivity {
 
+    // embarrassingly enough i don't know how to reference this class from within an alert so if someone could replace this singleton with that, that'd be great
+    static AdminActivity self;
+
     // What I have right now doesn't work. Feel free to completely change this.
 //    public static class CreateCourseFragment extends DialogFragment {
 //
@@ -58,6 +61,9 @@ public class AdminActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        self = this;
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
 
@@ -94,7 +100,7 @@ public class AdminActivity extends AppCompatActivity {
                 Log.d("sysout", "aosnthuoeanthuo");
                 String courseName = name.getText().toString();
                 String courseCode = code.getText().toString();
-                DatabaseHelper dbHelper = new DatabaseHelper(getParent());
+                DatabaseHelper dbHelper = new DatabaseHelper(self);
                 try {
                     dbHelper.addCourse(new Course(courseName, courseCode));
                     Log.d("sysout", "course added: " + courseName + " " + courseCode);
