@@ -41,6 +41,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Method for the onClick of btnSignUp.
+     * @param view  The view that calls this method.
+     */
     public void signUp(View view){
 
         String username = editUsernameUp.getText().toString();
@@ -72,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
             } else {    // Must be student.
                 newUser = new Student(username, password);
             }
-            newUser = new Admin(username, password);
 
             try {
                 dbHelper.addUser(newUser);
@@ -90,6 +93,10 @@ public class MainActivity extends AppCompatActivity {
         editRepeat.setText("");
     }
 
+    /**
+     * Method for the onClick of btnSignIn.
+     * @param view  The view that calls this method.
+     */
     public void signIn(View view){
 
         String username = editUsernameIn.getText().toString();

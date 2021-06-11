@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 //import android.widget.Button;
 
@@ -45,12 +46,25 @@ public class AdminActivity extends AppCompatActivity {
         cAdapter = new CoursesViewAdapter(dbHelper.getAllCourses());
         uAdapter = new UsersViewAdapter(dbHelper.getAllUsers());
 
+        LinearLayoutManager coursesLayoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager usersLayoutManager = new LinearLayoutManager(this);
+
+        CoursesView.setLayoutManager(coursesLayoutManager);
+        UsersView.setLayoutManager(usersLayoutManager);
+
+        CoursesView.setAdapter(cAdapter);
+        UsersView.setAdapter(uAdapter);
+
         Intent intent = getIntent();
         admin = (Admin) dbHelper.getUser(intent.getStringExtra(MainActivity.EXTRA_USER));
 
         tvAdminName.setText("Welcome " + admin.getUsername());
     }
 
+    /**
+     * Method for the onClick of btnCreateCourse.
+     * @param view  The view that calls the method.
+     */
     public void createCourse(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Create Course");
@@ -69,12 +83,16 @@ public class AdminActivity extends AppCompatActivity {
                 String courseName = name.getText().toString();
                 String courseCode = code.getText().toString();
                 DatabaseHelper dbHelper = new DatabaseHelper(self);
+
+                // Needs to check for blank arguments (does not at the moment).
                 try {
                     dbHelper.addCourse(new Course(courseName, courseCode));
                     Log.d("sysout", "course added: " + courseName + " " + courseCode);
                 } catch (IllegalArgumentException e) {
                     Utils.createErrorDialog(self, R.string.course_already_exists);
                 }
+
+                self.refreshViews();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -85,9 +103,12 @@ public class AdminActivity extends AppCompatActivity {
         });
 
         builder.show();
-        refreshViews();
     }
 
+    /**
+     * Method for the onClick of btnEditCCode.
+     * @param view  The view that calls this method.
+     */
     public void editCourseCode(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Edit Course Code");
@@ -122,6 +143,8 @@ public class AdminActivity extends AppCompatActivity {
                 } catch (IllegalArgumentException e) {
                     Utils.createErrorDialog(self, R.string.course_not_found);
                 }
+
+                self.refreshViews();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -132,9 +155,12 @@ public class AdminActivity extends AppCompatActivity {
         });
 
         builder.show();
-        refreshViews();
     }
 
+    /**
+     * Method for the onClick of btnEditCName.
+     * @param view  The view that calls this method.
+     */
     public void editCourseName(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Edit Course Name");
@@ -165,6 +191,8 @@ public class AdminActivity extends AppCompatActivity {
                 } catch (IllegalArgumentException e) {
                     Utils.createErrorDialog(self, R.string.course_not_found);
                 }
+
+                self.refreshViews();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -175,9 +203,12 @@ public class AdminActivity extends AppCompatActivity {
         });
 
         builder.show();
-        refreshViews();
     }
 
+    /**
+     * Method for the onClick of btnDeleteCourse.
+     * @param view  The view that calls this method.
+     */
     public void deleteCourse(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Delete Course");
@@ -196,6 +227,8 @@ public class AdminActivity extends AppCompatActivity {
                 } catch (IllegalArgumentException e) {
                     Utils.createErrorDialog(self, R.string.course_not_found);
                 }
+
+                self.refreshViews();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -206,10 +239,12 @@ public class AdminActivity extends AppCompatActivity {
         });
 
         builder.show();
-        refreshViews();
     }
 
-
+    /**
+     * Method for the onClick of btnDeleteUser.
+     * @param view  The view that calls this method.
+     */
     public void deleteUser(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Delete User");
@@ -221,6 +256,8 @@ public class AdminActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 String username = name.getText().toString();
                 DatabaseHelper dbHelper = new DatabaseHelper(self);
+
+                // Should probably prevent deletion of admin types.
                 try {
                     User user = dbHelper.getUser(username);
                     if (!dbHelper.deleteUser(username)) {
@@ -229,6 +266,8 @@ public class AdminActivity extends AppCompatActivity {
                 } catch (IllegalArgumentException e) {
                     Utils.createErrorDialog(self, R.string.course_not_found);
                 }
+
+                self.refreshViews();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -239,9 +278,11 @@ public class AdminActivity extends AppCompatActivity {
         });
 
         builder.show();
-        refreshViews();
     }
 
+    /**
+     * Refreshes the RecyclerViews with the latest User and Course data.
+     */
     private void refreshViews() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         cAdapter.refresh(dbHelper.getAllCourses());

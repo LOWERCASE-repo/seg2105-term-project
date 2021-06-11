@@ -1,5 +1,6 @@
 package com.example.seg2105termproject;
 
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -9,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class UsersViewAdapter extends RecyclerView.Adapter<UsersViewAdapter.UserHolder> {
 
+    // The array holding the Users to display on the RecyclerView.
     private User[] usersDataset;
 
     public static class UserHolder extends RecyclerView.ViewHolder{
@@ -21,25 +23,25 @@ public class UsersViewAdapter extends RecyclerView.Adapter<UsersViewAdapter.User
             tvUNameRow = view.findViewById(R.id.tvUNameRow);
         }
 
-        public TextView getTvUTypeRow() {
-            return tvUTypeRow;
-        }
+        public TextView getTvUTypeRow() { return tvUTypeRow; }
 
-        public TextView getTvUNameRow() {
-            return tvUNameRow;
-        }
+        public TextView getTvUNameRow() { return tvUNameRow; }
     }
 
     public UsersViewAdapter(User[] dataset) { this.usersDataset = dataset; }
 
     @Override
-    public UsersViewAdapter.UserHolder onCreateViewHolder( ViewGroup parent, int viewType) {
-        return null;
+    public UserHolder onCreateViewHolder( ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.users_view_row, parent, false);
+
+        return new UserHolder(view);
     }
 
     @Override
     public void onBindViewHolder(UsersViewAdapter.UserHolder holder, int position) {
-
+        holder.getTvUTypeRow().setText("User Type: " + usersDataset[position].getType().toString());
+        holder.getTvUNameRow().setText("Name: " + usersDataset[position].getUsername());
     }
 
     @Override
@@ -47,6 +49,11 @@ public class UsersViewAdapter extends RecyclerView.Adapter<UsersViewAdapter.User
         return usersDataset.length;
     }
 
+    /**
+     * Displays the passed array of Users on the RecyclerView.
+     * Essentially "refreshes" the RecyclerView with the passed information.
+     * @param users     The array of Users to display on the RecyclerView.
+     */
     public void refresh(User[] users){
         this.usersDataset = users;
         this.notifyDataSetChanged();
