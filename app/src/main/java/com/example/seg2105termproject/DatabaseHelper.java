@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -209,14 +210,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
          * (which is more straight-forward) if we want.
          */
 
-        // Instance the SQL query to get the entry (Course) with the passed course code.
-        String query = "SELECT * FROM " + CourseTable.TABLE_NAME +
-                "WHERE " + CourseTable.COLUMN_COURSE_CODE +
-                " = \"" + courseCode + "\"";
+        String query = String.format("SELECT * FROM %s WHERE %s = \"%s\"", CourseTable.TABLE_NAME, CourseTable.COLUMN_COURSE_CODE, courseCode);
 
         // Construct the Cursor object with the "raw" query.
         Cursor cursor = db.rawQuery(query, null);
 
+        Log.d("sysout", "so the cursor lived");
         // Check if the Course with the passed course code is found.
         boolean result = cursor.moveToFirst();
 
@@ -227,12 +226,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String id = cursor.getString(0);
 
             // Query the database to delete the User if the associated ID.
+            Log.d("sysout", "or this");
             db.delete(
                     CourseTable.TABLE_NAME,
                     Accounts._ID + " = " + id,
                     null);
+            Log.d("sysout", "doubt this one though");
         }
 
+        Log.d("sysout", "huh");
         // Regardless of success or not, close the cursor and database.
         cursor.close();
         db.close();
@@ -297,6 +299,45 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String query = "SELECT * FROM " + CourseTable.TABLE_NAME +
                 " WHERE " + CourseTable.COLUMN_COURSE_CODE +
                 " = \"" + courseCode + "\"";
+
+        // Construct the Cursor object with the "raw" query.
+        Cursor cursor = db.rawQuery(query, null);
+
+        // Declare Course variable.
+        Course course;
+
+        // If the Course was found,
+        if (cursor.moveToFirst()){
+
+            // Construct the course object.
+            course = new Course(
+                    cursor.getInt(0),
+                    cursor.getString(1),
+                    cursor.getString(2)
+            );
+
+        } else {
+            // If the course was not found, set to null.
+            course = null;
+        }
+
+        // Close the cursor and database objects.
+        cursor.close();
+        db.close();
+
+        // Return the Course (or null if not found).
+        return course;
+    }
+
+    public Course getCourseFromName(String courseName){
+
+        // Get reference to writable database.
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Instance the SQL query to get the entry (Course) with the passed course code.
+        String query = "SELECT * FROM " + CourseTable.TABLE_NAME +
+                " WHERE " + CourseTable.COLUMN_COURSE_NAME +
+                " = \"" + courseName + "\"";
 
         // Construct the Cursor object with the "raw" query.
         Cursor cursor = db.rawQuery(query, null);

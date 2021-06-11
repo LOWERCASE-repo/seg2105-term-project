@@ -38,9 +38,12 @@
     </select>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="57bee9d9-4b3d-4be4-809a-78c4f933fd4a" name="Default Changelist" comment="buff alert dialogue working">
+    <list default="true" id="57bee9d9-4b3d-4be4-809a-78c4f933fd4a" name="Default Changelist" comment="aight course creation is go">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/AdminActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/AdminActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/DatabaseHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/DatabaseHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_admin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_admin.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,7 +111,7 @@
     <property name="DeviceAndSnapshotComboBoxAction.selectedDevice" value="VirtualDevicePath@C:\Users\LOWERCASE\.android\avd\Pixel_3a_API_30_x86.avd" />
     <property name="DeviceAndSnapshotComboBoxAction.selectionTime" value="2021-06-10T23:32:27.973618300Z" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="com.android.tools.idea.sqlite.queryhistory" value="select * from User_Accounts&#10;select * from Course_Table" />
+    <property name="com.android.tools.idea.sqlite.queryhistory" value="select * from Course_Table&#10;select * from User_Accounts" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../Lab3" />
   </component>
   <component name="RunManager">
@@ -251,26 +254,26 @@
       <screen x="82" y="0" width="1454" height="864" />
     </state>
     <state x="484" y="66" key="FileChooserDialogImpl/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1622820662411" />
-    <state width="1853" height="215" key="GridCell.Tab.0.bottom" timestamp="1623371279500">
-      <screen x="2482" y="0" width="1838" height="1080" />
+    <state width="1387" height="141" key="GridCell.Tab.0.bottom" timestamp="1623374018569">
+      <screen x="82" y="0" width="1454" height="864" />
     </state>
     <state width="1853" height="215" key="GridCell.Tab.0.bottom/2482.0.1838.1080/82.0.1454.864@2482.0.1838.1080" timestamp="1623371279500" />
-    <state width="1387" height="192" key="GridCell.Tab.0.bottom/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623367620528" />
-    <state width="1853" height="215" key="GridCell.Tab.0.center" timestamp="1623371279499">
-      <screen x="2482" y="0" width="1838" height="1080" />
+    <state width="1387" height="141" key="GridCell.Tab.0.bottom/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623374018569" />
+    <state width="1387" height="141" key="GridCell.Tab.0.center" timestamp="1623374018569">
+      <screen x="82" y="0" width="1454" height="864" />
     </state>
     <state width="1853" height="215" key="GridCell.Tab.0.center/2482.0.1838.1080/82.0.1454.864@2482.0.1838.1080" timestamp="1623371279499" />
-    <state width="1387" height="192" key="GridCell.Tab.0.center/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623367620528" />
-    <state width="1853" height="215" key="GridCell.Tab.0.left" timestamp="1623371279499">
-      <screen x="2482" y="0" width="1838" height="1080" />
+    <state width="1387" height="141" key="GridCell.Tab.0.center/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623374018569" />
+    <state width="1387" height="141" key="GridCell.Tab.0.left" timestamp="1623374018568">
+      <screen x="82" y="0" width="1454" height="864" />
     </state>
     <state width="1853" height="215" key="GridCell.Tab.0.left/2482.0.1838.1080/82.0.1454.864@2482.0.1838.1080" timestamp="1623371279499" />
-    <state width="1387" height="192" key="GridCell.Tab.0.left/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623367620528" />
-    <state width="1853" height="215" key="GridCell.Tab.0.right" timestamp="1623371279499">
-      <screen x="2482" y="0" width="1838" height="1080" />
+    <state width="1387" height="141" key="GridCell.Tab.0.left/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623374018568" />
+    <state width="1387" height="141" key="GridCell.Tab.0.right" timestamp="1623374018569">
+      <screen x="82" y="0" width="1454" height="864" />
     </state>
     <state width="1853" height="215" key="GridCell.Tab.0.right/2482.0.1838.1080/82.0.1454.864@2482.0.1838.1080" timestamp="1623371279499" />
-    <state width="1387" height="192" key="GridCell.Tab.0.right/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623367620528" />
+    <state width="1387" height="141" key="GridCell.Tab.0.right/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623374018569" />
     <state x="299" y="14" key="RollbackChangesDialog" timestamp="1623366306598">
       <screen x="82" y="0" width="1454" height="864" />
     </state>

@@ -44,6 +44,7 @@
     <string name="user_already_exists">That username is already being used.</string>
     <string name="password_incorrect">Incorrect password.</string>
     <string name="course_already_exists">That course code is already in use.</string>
+    <string name="course_not_found">Course not found.</string>
 
     <string name="success">Success</string>
 

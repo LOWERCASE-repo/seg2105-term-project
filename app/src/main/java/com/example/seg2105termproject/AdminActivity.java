@@ -19,37 +19,6 @@ public class AdminActivity extends AppCompatActivity {
     // embarrassingly enough i don't know how to reference this class from within an alert so if someone could replace this singleton with that, that'd be great
     static AdminActivity self;
 
-    // What I have right now doesn't work. Feel free to completely change this.
-//    public static class CreateCourseFragment extends DialogFragment {
-//
-//        @Override
-//        public Dialog onCreateDialog(Bundle savedInstanceState) {
-//
-//            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//            LayoutInflater inflater = requireActivity().getLayoutInflater();
-//
-//            EditText editCName = this.getActivity().findViewById(R.id.editCNameCreate);
-//            EditText editCCode = this.getActivity().findViewById(R.id.editCCodeCreate);
-//
-//            builder.setView(inflater.inflate(R.layout.create_course_dialog, null))
-//                    .setTitle(R.string.create_course)
-//                    .setPositiveButton(R.string.create, (dialog, which) -> {
-//                        String courseName = editCName.getText().toString();
-//                        String courseCode = editCCode.getText().toString();
-//
-//                        DatabaseHelper dbHelper = new DatabaseHelper(this.getActivity());
-//
-//                        try {
-//                            dbHelper.addCourse(new Course(courseName, courseCode));
-//                        } catch (IllegalArgumentException e) {
-//                            Utils.createErrorDialog(this.getActivity(), R.string.course_already_exists);
-//                        }
-//                    });
-//
-//            return builder.create();
-//        }
-//    }
-
     Admin admin;
 
     //    Button btnCreateCourse, btnDeleteCourse, btnFindCName, btnFindCCode, btnDeleteUser;
@@ -97,7 +66,6 @@ public class AdminActivity extends AppCompatActivity {
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Log.d("sysout", "aosnthuoeanthuo");
                 String courseName = name.getText().toString();
                 String courseCode = code.getText().toString();
                 DatabaseHelper dbHelper = new DatabaseHelper(self);
@@ -105,8 +73,97 @@ public class AdminActivity extends AppCompatActivity {
                     dbHelper.addCourse(new Course(courseName, courseCode));
                     Log.d("sysout", "course added: " + courseName + " " + courseCode);
                 } catch (IllegalArgumentException e) {
-                    Log.d("sysout", "shit");
-                    Utils.createErrorDialog(getParent(), R.string.course_already_exists);
+                    Utils.createErrorDialog(self, R.string.course_already_exists);
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+        refreshViews();
+    }
+
+    public void editCourseCode(View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Edit Course Code");
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        final EditText name = new EditText(this);
+        name.setHint("Name");
+        layout.addView(name);
+        final EditText code = new EditText(this);
+        code.setHint("New Code");
+        layout.addView(code);
+        builder.setView(layout);
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String courseName = name.getText().toString();
+                String courseCode = code.getText().toString();
+                DatabaseHelper dbHelper = new DatabaseHelper(self);
+                try {
+                    Course course = dbHelper.getCourseFromName(courseName);
+                    if (course == null) {
+                        Utils.createErrorDialog(self, R.string.course_not_found);
+                        return;
+                    }
+                    String oldCode = course.getCourseCode();
+                    course.setCourseCode(courseCode);
+                    Log.d("sysout", "attempting deletion");
+                    dbHelper.deleteCourse(oldCode); // not sure if theres a way to update without deleting but if data's being lost, it's probably because of this
+                    Log.d("sysout", "deletion successful");
+                    dbHelper.addCourse(course);
+                    Log.d("sysout", "course code edited: " + courseName + " " + courseCode);
+                } catch (IllegalArgumentException e) {
+                    Utils.createErrorDialog(self, R.string.course_not_found);
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+        refreshViews();
+    }
+
+    public void editCourseName(View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Edit Course Name");
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        final EditText name = new EditText(this);
+        name.setHint("New Name");
+        layout.addView(name);
+        final EditText code = new EditText(this);
+        code.setHint("Code");
+        layout.addView(code);
+        builder.setView(layout);
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String courseName = name.getText().toString();
+                String courseCode = code.getText().toString();
+                DatabaseHelper dbHelper = new DatabaseHelper(self);
+                try {
+                    Course course = dbHelper.getCourse(courseCode);
+                    if (course == null) {
+                        Utils.createErrorDialog(self, R.string.course_not_found);
+                        return;
+                    }
+                    dbHelper.deleteCourse(courseCode); // not sure if theres a way to update without deleting but if data's being lost, it's probably because of this
+                    course.setCourseName(courseName);
+                    dbHelper.addCourse(course);
+                } catch (IllegalArgumentException e) {
+                    Utils.createErrorDialog(self, R.string.course_not_found);
                 }
             }
         });
