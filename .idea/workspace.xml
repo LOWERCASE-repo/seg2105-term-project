@@ -6,7 +6,7 @@
     </shared>
   </component>
   <component name="AndroidLogFilters">
-    <option name="TOOL_WINDOW_LOG_LEVEL" value="verbose" />
+    <option name="TOOL_WINDOW_LOG_LEVEL" value="debug" />
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
   <component name="AutoImportSettings">
@@ -28,18 +28,26 @@
         <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
       </path>
     </expand>
-    <select />
+    <select>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="BRANCH:dev" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </select>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="57bee9d9-4b3d-4be4-809a-78c4f933fd4a" name="Default Changelist" comment="">
+    <list default="true" id="57bee9d9-4b3d-4be4-809a-78c4f933fd4a" name="Default Changelist" comment="merged from main">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/AdminActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/AdminActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/MainActivity.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[SerialNumber@ac90a56]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[VirtualDevicePath@C:\Users\LOWERCASE\.android\avd\Pixel_3a_API_30_x86.avd]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -97,7 +105,10 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="DeviceAndSnapshotComboBoxAction.selectedDevice" value="VirtualDevicePath@C:\Users\LOWERCASE\.android\avd\Pixel_3a_API_30_x86.avd" />
+    <property name="DeviceAndSnapshotComboBoxAction.selectionTime" value="2021-06-10T23:32:27.973618300Z" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="com.android.tools.idea.sqlite.queryhistory" value="select * from User_Accounts&#10;select * from Course_Table" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../Lab3" />
   </component>
   <component name="RunManager">
@@ -176,6 +187,14 @@
       <option name="presentableId" value="Default" />
       <updated>1622219576571</updated>
     </task>
+    <task id="LOCAL-00001" summary="merged from main">
+      <created>1623366402682</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1623366402682</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -183,37 +202,82 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="CUSTOM_BOOLEAN_PROPERTIES">
+                <map>
+                  <entry key="Show.Git.Branches" value="true" />
+                </map>
+              </option>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="dev" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="merged from main" />
+    <option name="LAST_COMMIT_MESSAGE" value="merged from main" />
+  </component>
   <component name="WindowStateProjectService">
+    <state x="175" y="93" width="1268" height="678" key="AVDManager" timestamp="1623367962255">
+      <screen x="82" y="0" width="1454" height="864" />
+    </state>
+    <state x="175" y="93" width="1268" height="678" key="AVDManager/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623367962255" />
+    <state x="636" y="149" key="AndroidCreateXmlResourceDialog" timestamp="1623366809716">
+      <screen x="82" y="0" width="1454" height="864" />
+    </state>
+    <state x="636" y="149" key="AndroidCreateXmlResourceDialog/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623366809716" />
     <state x="484" y="66" key="FileChooserDialogImpl" timestamp="1622820662411">
       <screen x="82" y="0" width="1454" height="864" />
     </state>
     <state x="484" y="66" key="FileChooserDialogImpl/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1622820662411" />
-    <state width="1387" height="192" key="GridCell.Tab.0.bottom" timestamp="1623366183779">
+    <state width="1853" height="215" key="GridCell.Tab.0.bottom" timestamp="1623371088980">
+      <screen x="2482" y="0" width="1838" height="1080" />
+    </state>
+    <state width="1853" height="215" key="GridCell.Tab.0.bottom/2482.0.1838.1080/82.0.1454.864@2482.0.1838.1080" timestamp="1623371088980" />
+    <state width="1387" height="192" key="GridCell.Tab.0.bottom/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623367620528" />
+    <state width="1853" height="215" key="GridCell.Tab.0.center" timestamp="1623371088980">
+      <screen x="2482" y="0" width="1838" height="1080" />
+    </state>
+    <state width="1853" height="215" key="GridCell.Tab.0.center/2482.0.1838.1080/82.0.1454.864@2482.0.1838.1080" timestamp="1623371088980" />
+    <state width="1387" height="192" key="GridCell.Tab.0.center/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623367620528" />
+    <state width="1853" height="215" key="GridCell.Tab.0.left" timestamp="1623371088980">
+      <screen x="2482" y="0" width="1838" height="1080" />
+    </state>
+    <state width="1853" height="215" key="GridCell.Tab.0.left/2482.0.1838.1080/82.0.1454.864@2482.0.1838.1080" timestamp="1623371088980" />
+    <state width="1387" height="192" key="GridCell.Tab.0.left/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623367620528" />
+    <state width="1853" height="215" key="GridCell.Tab.0.right" timestamp="1623371088980">
+      <screen x="2482" y="0" width="1838" height="1080" />
+    </state>
+    <state width="1853" height="215" key="GridCell.Tab.0.right/2482.0.1838.1080/82.0.1454.864@2482.0.1838.1080" timestamp="1623371088980" />
+    <state width="1387" height="192" key="GridCell.Tab.0.right/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623367620528" />
+    <state x="299" y="14" key="RollbackChangesDialog" timestamp="1623366306598">
       <screen x="82" y="0" width="1454" height="864" />
     </state>
-    <state width="1387" height="192" key="GridCell.Tab.0.bottom/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623366183779" />
-    <state width="1387" height="192" key="GridCell.Tab.0.center" timestamp="1623366183779">
+    <state x="299" y="14" key="RollbackChangesDialog/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623366306598" />
+    <state x="202" y="33" key="Vcs.Push.Dialog.v2" timestamp="1623366422953">
       <screen x="82" y="0" width="1454" height="864" />
     </state>
-    <state width="1387" height="192" key="GridCell.Tab.0.center/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623366183779" />
-    <state width="1387" height="192" key="GridCell.Tab.0.left" timestamp="1623366183778">
+    <state x="202" y="33" key="Vcs.Push.Dialog.v2/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623366422953" />
+    <state x="538" y="305" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1623367962218">
       <screen x="82" y="0" width="1454" height="864" />
     </state>
-    <state width="1387" height="192" key="GridCell.Tab.0.left/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623366183778" />
-    <state width="1387" height="192" key="GridCell.Tab.0.right" timestamp="1623366183779">
+    <state x="538" y="305" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623367962218" />
+    <state x="328" y="2" key="git4idea.branch.GitSmartOperationDialog" timestamp="1623366983965">
       <screen x="82" y="0" width="1454" height="864" />
     </state>
-    <state width="1387" height="192" key="GridCell.Tab.0.right/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623366183779" />
-    <state x="328" y="2" key="git4idea.branch.GitSmartOperationDialog" timestamp="1623366088410">
-      <screen x="82" y="0" width="1454" height="864" />
-    </state>
-    <state x="328" y="2" key="git4idea.branch.GitSmartOperationDialog/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623366088410" />
+    <state x="328" y="2" key="git4idea.branch.GitSmartOperationDialog/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623366983965" />
   </component>
 </project>
