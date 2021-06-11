@@ -38,11 +38,10 @@
     </select>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="57bee9d9-4b3d-4be4-809a-78c4f933fd4a" name="Default Changelist" comment="edit course code and edit course name are workin">
+    <list default="true" id="57bee9d9-4b3d-4be4-809a-78c4f933fd4a" name="Default Changelist" comment="all admin actions working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/AdminActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/AdminActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/DatabaseHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/DatabaseHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_admin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_admin.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -100,6 +99,7 @@
   </component>
   <component name="ProjectId" id="1tAl3iYxxPdza1hGkklSZFvxB22" />
   <component name="ProjectLevelVcsManager">
+    <OptionsSetting value="false" id="Update" />
     <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectViewState">
@@ -285,13 +285,15 @@
       <screen x="82" y="0" width="1454" height="864" />
     </state>
     <state x="299" y="14" key="RollbackChangesDialog/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623366306598" />
-    <state x="202" y="33" key="Vcs.Push.Dialog.v2" timestamp="1623366422953">
-      <screen x="82" y="0" width="1454" height="864" />
+    <state x="2634" y="41" key="Vcs.Push.Dialog.v2" timestamp="1623376604645">
+      <screen x="2482" y="0" width="1838" height="1080" />
     </state>
+    <state x="2634" y="41" key="Vcs.Push.Dialog.v2/2482.0.1838.1080/82.0.1454.864@2482.0.1838.1080" timestamp="1623376604645" />
     <state x="202" y="33" key="Vcs.Push.Dialog.v2/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623366422953" />
-    <state x="538" y="305" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1623367962218">
-      <screen x="82" y="0" width="1454" height="864" />
+    <state x="3058" y="381" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1623428437714">
+      <screen x="2482" y="0" width="1838" height="1080" />
     </state>
+    <state x="3058" y="381" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/2482.0.1838.1080/82.0.1454.864@2482.0.1838.1080" timestamp="1623428437714" />
     <state x="538" y="305" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623367962218" />
     <state x="328" y="2" key="git4idea.branch.GitSmartOperationDialog" timestamp="1623366983965">
       <screen x="82" y="0" width="1454" height="864" />

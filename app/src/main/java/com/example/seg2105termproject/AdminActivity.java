@@ -84,7 +84,10 @@ public class AdminActivity extends AppCompatActivity {
                 String courseCode = code.getText().toString();
                 DatabaseHelper dbHelper = new DatabaseHelper(self);
 
-                // Needs to check for blank arguments (does not at the moment).
+                if (courseName.equals("") || courseCode.equals("")) {
+                    Utils.createErrorDialog(self, R.string.parameters_missing);
+                    return;
+                }
                 try {
                     dbHelper.addCourse(new Course(courseName, courseCode));
                     Log.d("sysout", "course added: " + courseName + " " + courseCode);
@@ -257,10 +260,9 @@ public class AdminActivity extends AppCompatActivity {
                 String username = name.getText().toString();
                 DatabaseHelper dbHelper = new DatabaseHelper(self);
 
-                // Should probably prevent deletion of admin types.
                 try {
                     User user = dbHelper.getUser(username);
-                    if (!dbHelper.deleteUser(username)) {
+                    if (user.getType() == UserType.ADMIN || !dbHelper.deleteUser(username)) {
                         Utils.createErrorDialog(self, R.string.user_not_found);
                     }
                 } catch (IllegalArgumentException e) {
