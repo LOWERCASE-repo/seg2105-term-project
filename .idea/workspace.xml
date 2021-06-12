@@ -33,13 +33,16 @@
       <path>
         <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
         <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
-        <item name="BRANCH:main" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="BRANCH:dev" type="e8cecc67:BranchNodeDescriptor" />
       </path>
     </select>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="57bee9d9-4b3d-4be4-809a-78c4f933fd4a" name="Default Changelist" comment="Added further validation in AdminActivity and DatabaseHelper. App will now create a default admin account on startup. Changed the database definitions a bit to include unique constraints, so app will need to be reinstalled for changes to have effect.">
+    <list default="true" id="57bee9d9-4b3d-4be4-809a-78c4f933fd4a" name="Default Changelist" comment="all admin actions working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/AdminActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/AdminActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/DatabaseHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/DatabaseHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/MainActivity.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -209,14 +212,7 @@
       <option name="project" value="LOCAL" />
       <updated>1623374529655</updated>
     </task>
-    <task id="LOCAL-00004" summary="Added further validation in AdminActivity and DatabaseHelper. App will now create a default admin account on startup. Changed the database definitions a bit to include unique constraints, so app will need to be reinstalled for changes to have effect.">
-      <created>1623521827953</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1623521827953</updated>
-    </task>
-    <option name="localTasksCounter" value="5" />
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -235,7 +231,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="main" />
+                        <option value="dev" />
                       </list>
                     </value>
                   </entry>
@@ -252,8 +248,7 @@
     <MESSAGE value="merged from main" />
     <MESSAGE value="buff alert dialogue working" />
     <MESSAGE value="edit course code and edit course name are workin" />
-    <MESSAGE value="Added further validation in AdminActivity and DatabaseHelper. App will now create a default admin account on startup. Changed the database definitions a bit to include unique constraints, so app will need to be reinstalled for changes to have effect." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added further validation in AdminActivity and DatabaseHelper. App will now create a default admin account on startup. Changed the database definitions a bit to include unique constraints, so app will need to be reinstalled for changes to have effect." />
+    <option name="LAST_COMMIT_MESSAGE" value="edit course code and edit course name are workin" />
   </component>
   <component name="WindowStateProjectService">
     <state x="175" y="93" width="1268" height="678" key="AVDManager" timestamp="1623367962255">
@@ -316,10 +311,9 @@
       <screen x="82" y="0" width="1454" height="864" />
     </state>
     <state x="299" y="14" key="RollbackChangesDialog/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623366306598" />
-    <state x="159" y="39" key="Vcs.Push.Dialog.v2" timestamp="1623521834309">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state x="2634" y="41" key="Vcs.Push.Dialog.v2" timestamp="1623376604645">
+      <screen x="2482" y="0" width="1838" height="1080" />
     </state>
-    <state x="159" y="39" key="Vcs.Push.Dialog.v2/0.0.1920.1040/-1920.0.1920.1040@0.0.1920.1040" timestamp="1623521834309" />
     <state x="2634" y="41" key="Vcs.Push.Dialog.v2/2482.0.1838.1080/82.0.1454.864@2482.0.1838.1080" timestamp="1623376604645" />
     <state x="202" y="33" key="Vcs.Push.Dialog.v2/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623366422953" />
     <state x="3058" y="381" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1623428437714">
