@@ -46,6 +46,7 @@
     <string name="course_already_exists">That course code is already in use.</string>
     <string name="course_not_found">Course not found.</string>
     <string name="parameters_missing">Parameter(s) are missing.</string>
+    <string name="cannot_delete_self">Cannot delete self (admin).</string>
 
     <string name="success">Success</string>
 
