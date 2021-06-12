@@ -84,7 +84,8 @@ public class AdminActivity extends AppCompatActivity {
                 String courseCode = code.getText().toString();
                 DatabaseHelper dbHelper = new DatabaseHelper(self);
 
-                if (courseName.equals("") || courseCode.equals("")) {
+                // Trimming removes excess whitespace
+                if (courseName.trim().equals("") || courseCode.trim().equals("")) {
                     Utils.createErrorDialog(self, R.string.parameters_missing);
                     return;
                 }
@@ -117,34 +118,27 @@ public class AdminActivity extends AppCompatActivity {
         builder.setTitle("Edit Course Code");
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
-        final EditText name = new EditText(this);
-        name.setHint("Name");
-        layout.addView(name);
-        final EditText code = new EditText(this);
-        code.setHint("New Code");
-        layout.addView(code);
+        final EditText oldCodeText = new EditText(this);
+        oldCodeText.setHint("Old Code");
+        layout.addView(oldCodeText);
+        final EditText newCodeText = new EditText(this);
+        newCodeText.setHint("New Code");
+        layout.addView(newCodeText);
         builder.setView(layout);
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String courseName = name.getText().toString();
-                String courseCode = code.getText().toString();
                 DatabaseHelper dbHelper = new DatabaseHelper(self);
                 try {
-                    Course course = dbHelper.getCourseFromName(courseName);
-                    if (course == null) {
-                        Utils.createErrorDialog(self, R.string.course_not_found);
+                    String oldCode = oldCodeText.getText().toString(), newCode = newCodeText.getText().toString();
+                    // Trimming removes excess whitespace
+                    if (oldCode.trim().equals("") || newCode.trim().equals("")) {
+                        Utils.createErrorDialog(self, R.string.parameters_missing);
                         return;
                     }
-                    String oldCode = course.getCourseCode();
-                    course.setCourseCode(courseCode);
-                    Log.d("sysout", "attempting deletion");
-                    dbHelper.deleteCourse(oldCode); // not sure if theres a way to update without deleting but if data's being lost, it's probably because of this
-                    Log.d("sysout", "deletion successful");
-                    dbHelper.addCourse(course);
-                    Log.d("sysout", "course code edited: " + courseName + " " + courseCode);
+                    dbHelper.changeCourseCode(oldCodeText.getText().toString(), newCodeText.getText().toString());
                 } catch (IllegalArgumentException e) {
-                    Utils.createErrorDialog(self, R.string.course_not_found);
+                    Utils.createErrorDialog(self, Integer.parseInt(e.getMessage()));
                 }
 
                 self.refreshViews();
@@ -181,16 +175,14 @@ public class AdminActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 String courseName = name.getText().toString();
                 String courseCode = code.getText().toString();
+                // Trimming removes excess whitespace
+                if (courseName.trim().equals("") || courseCode.trim().equals("")) {
+                    Utils.createErrorDialog(self, R.string.parameters_missing);
+                    return;
+                }
                 DatabaseHelper dbHelper = new DatabaseHelper(self);
                 try {
-                    Course course = dbHelper.getCourse(courseCode);
-                    if (course == null) {
-                        Utils.createErrorDialog(self, R.string.course_not_found);
-                        return;
-                    }
-                    dbHelper.deleteCourse(courseCode); // not sure if theres a way to update without deleting but if data's being lost, it's probably because of this
-                    course.setCourseName(courseName);
-                    dbHelper.addCourse(course);
+                    dbHelper.changeCourseName(courseCode, courseName);
                 } catch (IllegalArgumentException e) {
                     Utils.createErrorDialog(self, R.string.course_not_found);
                 }
@@ -222,11 +214,14 @@ public class AdminActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String courseCode = code.getText().toString();
+                // Trimming removes excess whitespace
+                if (courseCode.trim().equals("")) {
+                    Utils.createErrorDialog(self, R.string.parameters_missing);
+                    return;
+                }
                 DatabaseHelper dbHelper = new DatabaseHelper(self);
                 try {
-                    if (!dbHelper.deleteCourse(courseCode)) {
-                        Utils.createErrorDialog(self, R.string.course_not_found);
-                    }
+                    dbHelper.deleteCourse(courseCode);
                 } catch (IllegalArgumentException e) {
                     Utils.createErrorDialog(self, R.string.course_not_found);
                 }
@@ -259,14 +254,19 @@ public class AdminActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 String username = name.getText().toString();
                 DatabaseHelper dbHelper = new DatabaseHelper(self);
-
+                // Trimming removes excess whitespace
+                if (username.trim().equals("")) {
+                    Utils.createErrorDialog(self, R.string.parameters_missing);
+                    return;
+                }
                 try {
                     User user = dbHelper.getUser(username);
-                    if (user.getType() == UserType.ADMIN || !dbHelper.deleteUser(username)) {
+                    if (user.getType() == UserType.ADMIN ) {
                         Utils.createErrorDialog(self, R.string.user_not_found);
                     }
+                    dbHelper.deleteUser(username);
                 } catch (IllegalArgumentException e) {
-                    Utils.createErrorDialog(self, R.string.course_not_found);
+                    Utils.createErrorDialog(self, R.string.user_not_found);
                 }
 
                 self.refreshViews();

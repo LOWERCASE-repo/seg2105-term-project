@@ -39,14 +39,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + Accounts.TABLE_NAME + " (" +
                     Accounts._ID + " INTEGER PRIMARY KEY," +
                     Accounts.COLUMN_USER_TYPE + " TEXT," +
-                    Accounts.COLUMN_USERNAME + " TEXT," +
+                    Accounts.COLUMN_USERNAME + " TEXT UNIQUE," +
                     Accounts.COLUMN_PASSWORD + " TEXT)";
 
     private static final String SQL_CREATE_COURSETABLE =
             "CREATE TABLE " + CourseTable.TABLE_NAME + " (" +
                     CourseTable._ID + " INTEGER PRIMARY KEY," +
                     CourseTable.COLUMN_COURSE_NAME + " TEXT," +
-                    CourseTable.COLUMN_COURSE_CODE + " TEXT)";
+                    CourseTable.COLUMN_COURSE_CODE + " TEXT UNIQUE)";
 
     private static final String SQL_DELETE_ACCOUNTS =
             "DROP TABLE IF EXISTS " + Accounts.TABLE_NAME;
@@ -89,29 +89,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Get reference to writable database (opens it?).
         SQLiteDatabase db = this.getWritableDatabase();
 
-        // Check if the username is already in use.
-
-        // Instance the SQL query to get the entry (User) with the passed username.
-        String query = "SELECT * FROM " + Accounts.TABLE_NAME +
-                " WHERE " + Accounts.COLUMN_USERNAME +
-                " = \"" + user.getUsername() + "\"";
-
-        // Construct the Cursor object with the "raw" query.
-        Cursor cursor = db.rawQuery(query, null);
-
-        // Check if the cursor can find a user with the username.
-        if (cursor.moveToFirst()){
-            throw new IllegalArgumentException("User already exists.");
-        }
-
         // Put values of User object into container object.
         ContentValues values = new ContentValues();
         values.put(Accounts.COLUMN_USER_TYPE, user.getType().toString());
         values.put(Accounts.COLUMN_USERNAME, user.getUsername());
         values.put(Accounts.COLUMN_PASSWORD, user.getPassword());
 
-        // Insert the entry into the Accounts table of the database.
-        db.insert(Accounts.TABLE_NAME, null, values);
+        // Insert the entry into the Accounts table of the database, throw an error if we
+        // invalidate the unique constraint.
+        if (db.insert(Accounts.TABLE_NAME, null, values) == -1) {
+            throw new IllegalArgumentException();
+        }
 
         // Close the reference.
         db.close();
@@ -133,8 +121,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(CourseTable.COLUMN_COURSE_NAME, course.getCourseName());
         values.put(CourseTable.COLUMN_COURSE_CODE, course.getCourseCode());
 
-        // Insert the entry into the CourseTable table of the database.
-        db.insert(CourseTable.TABLE_NAME, null, values);
+        // Insert the entry into the CourseTable table of the database, throw an error if we
+        // invalidate the unique constraint.
+        if (db.insert(CourseTable.TABLE_NAME, null, values) == -1) {
+            throw new IllegalArgumentException();
+        }
 
         // Close the reference.
         db.close();
@@ -143,104 +134,120 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /**
      * Delete the User with the corresponding username.
      * @param username  The username string of the User that should be deleted.
-     * @return  A boolean representing if the deletion was successful or not.
-     *          True if the corresponding User was deleted from the database.
-     *          False if no User was found and deleted.
+     * @throws IllegalArgumentException if deletion was not successful
      */
-    public boolean deleteUser (String username){
+    public void deleteUser (String username){
 
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
 
-        /*
-         * I used the less straight-forward method shown in Lab 3 of SEG 2105,
-         * for the sake of using something we should all understand.
-         * We could also swap over to the method Android Studio docs show
-         * (which is more straight-forward) if we want.
-         */
+        // Query the database to delete the User, throw an exception if 0 rows were affected.
+        int result = db.delete(
+                Accounts.TABLE_NAME,
+                Accounts.COLUMN_USERNAME + " = " + username,
+                null);
 
-        // Instance the SQL query to get the entry (User) with the passed username.
-        String query = "SELECT * FROM " + Accounts.TABLE_NAME +
-                " WHERE " + Accounts.COLUMN_USERNAME +
-                " = \"" + username + "\"";
-
-        // Construct the Cursor object with the "raw" query.
-        Cursor cursor = db.rawQuery(query, null);
-
-        // Check if the User with the passed username is found.
-        boolean result = cursor.moveToFirst();
-
-        // If true,
-        if (result){
-
-            // Obtain the ID of the User.
-            String id = cursor.getString(0);
-
-            // Query the database to delete the User if the associated ID.
-            db.delete(
-                    Accounts.TABLE_NAME,
-                    Accounts._ID + " = " + id,
-                    null);
-        }
-
-        // Regardless of success or not, close the cursor and database.
-        cursor.close();
+        // Regardless of success or not, close the database.
         db.close();
 
-        // Return the boolean representing if the deletion was successful or not.
-        return result;
+        // if we didn't modify any rows, show error message
+        if (result == 0) throw new IllegalArgumentException();
     }
 
     /**
      * Delete the Course with the corresponding course code.
      * @param courseCode    The course code string of the Course that should be deleted.
-     * @return  A boolean representing if the deletion was successful or not.
-     *          True if the corresponding Course was deleted from the database.
-     *          False if no Course was found and deleted.
+     * @throws IllegalArgumentException if deletion was not successful
      */
-    public boolean deleteCourse (String courseCode){
+    public void deleteCourse (String courseCode){
 
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
 
-        /*
-         * I used the less straight-forward method shown in Lab 3 of SEG 2105,
-         * for the sake of using something we should all understand.
-         * We could also swap over to the method Android Studio docs show
-         * (which is more straight-forward) if we want.
-         */
+        int result = db.delete(
+                CourseTable.TABLE_NAME,
+                CourseTable.COLUMN_COURSE_CODE + " = " + courseCode,
+                null);
 
-        String query = String.format("SELECT * FROM %s WHERE %s = \"%s\"", CourseTable.TABLE_NAME, CourseTable.COLUMN_COURSE_CODE, courseCode);
-
-        // Construct the Cursor object with the "raw" query.
-        Cursor cursor = db.rawQuery(query, null);
-
-        Log.d("sysout", "so the cursor lived");
-        // Check if the Course with the passed course code is found.
-        boolean result = cursor.moveToFirst();
-
-        // If true,
-        if (result){
-
-            // Obtain the ID of the User.
-            String id = cursor.getString(0);
-
-            // Query the database to delete the User if the associated ID.
-            Log.d("sysout", "or this");
-            db.delete(
-                    CourseTable.TABLE_NAME,
-                    Accounts._ID + " = " + id,
-                    null);
-            Log.d("sysout", "doubt this one though");
-        }
-
-        Log.d("sysout", "huh");
-        // Regardless of success or not, close the cursor and database.
-        cursor.close();
+        // Regardless of success or not, close the database.
         db.close();
 
-        // Return the boolean representing if the deletion was successful or not.
-        return result;
+        // if we didn't modify any rows, show error message
+        if (result == 0) throw new IllegalArgumentException();
+    }
+
+    /**
+     * Change the course code, with validation
+     * @param oldCode The current course code
+     * @param newCode The new course code.
+     * @throws IllegalArgumentException if course is not found, or new course code already exists
+     */
+    public void changeCourseCode (String oldCode, String newCode) throws IllegalArgumentException{
+        // Get reference to writable database.
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Check if the course is in the database
+        Cursor cursor = db.rawQuery(String.format("SELECT _ID FROM %s WHERE %s = \"%s\"",
+                CourseTable.TABLE_NAME, CourseTable.COLUMN_COURSE_CODE, oldCode), null);
+
+        // Make sure that the check was successful
+        if (!cursor.moveToFirst()) {
+            throw new IllegalArgumentException(String.valueOf(R.string.course_not_found));
+        }
+
+        // We'll use the id returned by the check
+        String id = String.valueOf(cursor.getInt(0));
+
+        // Close the cursor
+        cursor.close();
+
+        // Check that the new code isn't being used
+        cursor = db.rawQuery(String.format("SELECT _ID FROM %s WHERE %s = \"%s\"",
+                CourseTable.TABLE_NAME, CourseTable.COLUMN_COURSE_CODE, newCode), null);
+
+        // Make sure the check was successful
+        if (cursor.getCount() != 0) {
+            throw new IllegalArgumentException(String.valueOf(R.string.course_already_exists));
+        }
+
+        // Close the cursor
+        cursor.close();
+
+        // Create the variable to hold the update info, and execute the update.
+        ContentValues values = new ContentValues();
+        values.put(CourseTable.COLUMN_COURSE_CODE, newCode);
+        db.update(CourseTable.TABLE_NAME, values, CourseTable._ID + " = ?", new String[]{id});
+    }
+
+    /**
+     * Change the course name, with validation
+     * @param code The current course code
+     * @param newName The new course code.
+     * @throws IllegalArgumentException if course is not found, or new course code already exists
+     */
+    public void changeCourseName (String code, String newName) throws IllegalArgumentException{
+        // Get reference to writable database.
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Check if the course is in the database
+        Cursor cursor = db.rawQuery(String.format("SELECT _ID FROM %s WHERE %s = \"%s\"",
+                CourseTable.TABLE_NAME, CourseTable.COLUMN_COURSE_CODE, code), null);
+
+        // Make sure that the check was successful
+        if (!cursor.moveToFirst()) {
+            throw new IllegalArgumentException();
+        }
+
+        // We'll use the id returned by the check
+        String id = String.valueOf(cursor.getInt(0));
+
+        // Close the cursor
+        cursor.close();
+
+        // Create the variable to hold the update info, then execute the update.
+        ContentValues values = new ContentValues();
+        values.put(CourseTable.COLUMN_COURSE_NAME, newName);
+        db.update(CourseTable.TABLE_NAME, values, CourseTable._ID + " = ?", new String[]{id});
     }
 
     /**

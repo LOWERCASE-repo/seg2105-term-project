@@ -38,7 +38,11 @@ public class MainActivity extends AppCompatActivity {
         radInstructor = findViewById(R.id.radInstructor);
         radStudent = findViewById(R.id.radStudent);
 
-
+        // I don't want to import a starter database so I'll add a permanent admin account
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        try {
+            dbHelper.addUser(new Admin("admin", "admin"));
+        } catch (IllegalArgumentException ignored){}
     }
 
     /**
