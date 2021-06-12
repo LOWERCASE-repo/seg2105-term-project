@@ -262,9 +262,10 @@ public class AdminActivity extends AppCompatActivity {
                 try {
                     User user = dbHelper.getUser(username);
                     if (user.getType() == UserType.ADMIN ) {
-                        Utils.createErrorDialog(self, R.string.user_not_found);
+                        Utils.createErrorDialog(self, R.string.cannot_delete_self);
+                    } else {
+                        dbHelper.deleteUser(username);
                     }
-                    dbHelper.deleteUser(username);
                 } catch (IllegalArgumentException e) {
                     Utils.createErrorDialog(self, R.string.user_not_found);
                 }

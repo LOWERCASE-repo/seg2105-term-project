@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         // I don't want to import a starter database so I'll add a permanent admin account
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         try {
-            dbHelper.addUser(new Admin("admin", "admin"));
+            dbHelper.addUser(new Admin("admin", "admin123"));
         } catch (IllegalArgumentException ignored){}
     }
 

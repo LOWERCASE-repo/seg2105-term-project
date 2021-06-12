@@ -141,11 +141,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
 
+        String[] selectionArgs = {username};
+
         // Query the database to delete the User, throw an exception if 0 rows were affected.
         int result = db.delete(
                 Accounts.TABLE_NAME,
-                Accounts.COLUMN_USERNAME + " = " + username,
-                null);
+                Accounts.COLUMN_USERNAME + " LIKE ?",
+                selectionArgs);
 
         // Regardless of success or not, close the database.
         db.close();
@@ -164,10 +166,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
 
+        String[] selectionArgs = {courseCode};
+
         int result = db.delete(
                 CourseTable.TABLE_NAME,
-                CourseTable.COLUMN_COURSE_CODE + " = " + courseCode,
-                null);
+                CourseTable.COLUMN_COURSE_CODE + " LIKE ?",
+                selectionArgs);
 
         // Regardless of success or not, close the database.
         db.close();
