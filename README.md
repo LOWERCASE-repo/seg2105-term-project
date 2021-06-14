@@ -1,4 +1,5 @@
 Course Booking application for Android devices
+University of Ottawa - Faculty of Engineering - SEG2105
 
 This application will implement a basic course selection service for students and
 instructors. Students will be able to search for a course, instructors will be able to edit
@@ -34,8 +35,9 @@ A student can:
 
 
 
- University of Ottawa - Faculty of Engineering - SEG2105 -Course Booking application for Android devices
- * Authors      Sally R       <@uottawa.ca> 
+ 
+ Authors:
+ *              Sally R       <@uottawa.ca> 
  *              Jerry S       <@uottawa.ca>
  *              Glen W        <@uottawa.ca>
  *              Youssef J     <yjall032@uottawa.ca>
