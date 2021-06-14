@@ -8,7 +8,18 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-
+/**
+ * This file is part of Course Booking application for Android devices
+ *
+ * app/src/main/java/com/example/seg2105termproject
+ *
+ * University of Ottawa - Faculty of Engineering - SEG2105 -Course Booking application for Android devices
+ * @author      Sally R       <@uottawa.ca> 
+ *              Jerry S       <@uottawa.ca>
+ *              Glen W        <@uottawa.ca>
+ *              Youssef J     <yjall032@uottawa.ca>
+ * 
+*/
 public class CoursesViewAdapter extends RecyclerView.Adapter<CoursesViewAdapter.CourseHolder> {
 
     // The array holding the Courses to display on the RecyclerView.

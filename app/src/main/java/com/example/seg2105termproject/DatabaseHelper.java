@@ -7,7 +7,18 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import android.util.Log;
-
+/**
+ * This file is part of Course Booking application for Android devices
+ *
+ * app/src/main/java/com/example/seg2105termproject
+ *
+ * University of Ottawa - Faculty of Engineering - SEG2105 -Course Booking application for Android devices
+ * @author      Sally R       <@uottawa.ca> 
+ *              Jerry S       <@uottawa.ca>
+ *              Glen W        <@uottawa.ca>
+ *              Youssef J     <yjall032@uottawa.ca>
+ * 
+*/
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
