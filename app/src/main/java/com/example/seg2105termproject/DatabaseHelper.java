@@ -14,12 +14,16 @@ import android.util.Log;
  *
  * University of Ottawa - Faculty of Engineering - SEG2105 -Course Booking application for Android devices
  * @author      Sally R       <@uottawa.ca> 
- *              Jerry S       <@uottawa.ca>
+ *              Jerry S       <jsoon029@uottawa.ca>
  *              Glen W        <@uottawa.ca>
  *              Youssef J     <yjall032@uottawa.ca>
  * 
 */
 public class DatabaseHelper extends SQLiteOpenHelper {
+
+    // Just a thought: for better exception usage, perhaps consider changing
+    // IllegalArgumentExceptions to NoSuchElementExceptions for Deliverable 2 & 3.
+    // Only thought of this on June 14th. -Jerry S
 
     /**
      * Nested classes to define and contain table details.
@@ -172,7 +176,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param courseCode    The course code string of the Course that should be deleted.
      * @throws IllegalArgumentException if deletion was not successful
      */
-    public void deleteCourse (String courseCode){
+    public void deleteCourse (String courseCode) throws IllegalArgumentException{
 
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
@@ -269,9 +273,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Retrieve the User with the corresponding username from the database.
      * @param username  The username string of the needed User.
      * @return  A reference to the User with the corresponding username.
-     *          Null if no User with the username was found.
+     * @throws IllegalArgumentException if no User with the username was found.
      */
-    public User getUser (String username){
+    public User getUser (String username) throws IllegalArgumentException{
 
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
@@ -294,15 +298,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             user = constructUserSubclass(cursor);
 
         } else {
-            // If the object is not found, set to null.
-            user = null;
+            // If the object is not found, throw exception.
+            throw new IllegalArgumentException();
         }
 
         // Close the cursor and database objects.
         cursor.close();
         db.close();
 
-        // Return the User (or null if not found).
+        // Return the User.
         return user;
     }
 
@@ -310,9 +314,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Retrieve the Course with the corresponding course code from the database.
      * @param courseCode    The course code string of the needed Course.
      * @return  A reference to a Course with the corresponding course code.
-     *          Null if no Course with the course code was found.
+     * @throws IllegalArgumentException if no Course with the course code was found.
      */
-    public Course getCourse(String courseCode){
+    public Course getCourse(String courseCode) throws IllegalArgumentException{
 
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
@@ -339,19 +343,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             );
 
         } else {
-            // If the course was not found, set to null.
-            course = null;
+            // If the course was not found, throw exception.
+            throw new IllegalArgumentException();
         }
 
         // Close the cursor and database objects.
         cursor.close();
         db.close();
 
-        // Return the Course (or null if not found).
+        // Return the Course.
         return course;
     }
 
-    public Course getCourseFromName(String courseName){
+    /**
+     * Retrieve the Course with the corresponding course name from the database.
+     * @param courseName    The course name string of the needed Course.
+     * @return  A reference to a Course with the corresponding course name.
+     * @throws IllegalArgumentException if no Course with the course name was found.
+     */
+    public Course getCourseFromName(String courseName) throws IllegalArgumentException{
 
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
@@ -378,8 +388,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             );
 
         } else {
-            // If the course was not found, set to null.
-            course = null;
+            // If the course was not found, throw exception.
+            throw new IllegalArgumentException();
         }
 
         // Close the cursor and database objects.
