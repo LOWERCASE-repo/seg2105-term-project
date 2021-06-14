@@ -1,4 +1,11 @@
 package com.example.seg2105termproject;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 /**
  * This file is part of Course Booking application for Android devices
  *
@@ -11,14 +18,6 @@ package com.example.seg2105termproject;
  *              Youssef J     <yjall032@uottawa.ca>
  * 
 */
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
 public class UsersViewAdapter extends RecyclerView.Adapter<UsersViewAdapter.UserHolder> {
 
     // The array holding the Users to display on the RecyclerView.

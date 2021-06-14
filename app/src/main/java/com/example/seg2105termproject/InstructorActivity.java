@@ -1,4 +1,9 @@
 package com.example.seg2105termproject;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.TextView;
 /**
  * This file is part of Course Booking application for Android devices
  *
@@ -11,12 +16,6 @@ package com.example.seg2105termproject;
  *              Youssef J     <yjall032@uottawa.ca>
  * 
 */
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Intent;
-import android.os.Bundle;
-import android.widget.TextView;
-
 public class InstructorActivity extends AppCompatActivity {
 
     TextView tvInstructorName;

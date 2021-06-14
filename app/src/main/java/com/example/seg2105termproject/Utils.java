@@ -1,4 +1,7 @@
 package com.example.seg2105termproject;
+
+import android.content.Context;
+import androidx.appcompat.app.AlertDialog;
 /**
  * This file is part of Course Booking application for Android devices
  *
@@ -11,10 +14,6 @@ package com.example.seg2105termproject;
  *              Youssef J     <yjall032@uottawa.ca>
  * 
 */
-import android.content.Context;
-
-import androidx.appcompat.app.AlertDialog;
-
 public class Utils {
 
     /**

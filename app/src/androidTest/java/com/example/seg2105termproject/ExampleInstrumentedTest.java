@@ -1,16 +1,5 @@
 package com.example.seg2105termproject;
-/**
- * This file is part of Course Booking application for Android devices
- *
- * app/src/androidTest/java/com/example/seg2105termproject
- *
- * University of Ottawa - Faculty of Engineering - SEG2105 -Course Booking application for Android devices
- * @author      Sally R       <@uottawa.ca> 
- *              Jerry S       <@uottawa.ca>
- *              Glen W        <@uottawa.ca>
- *              Youssef J     <yjall032@uottawa.ca>
- * 
-*/
+
 import android.content.Context;
 
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -22,9 +11,21 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.*;
 
 /**
- * Instrumented test, which will execute on an Android device.
+ * This file is part of Course Booking application for Android devices
  *
+ * app/src/androidTest/java/com/example/seg2105termproject
+ * 
+ * Instrumented test, which will execute on an Android device.
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
+ *
+ * 
+ * 
+ *  University of Ottawa - Faculty of Engineering - SEG2105 -Course Booking application for Android devices
+ * @author      Sally R       <@uottawa.ca> 
+ *              Jerry S       <@uottawa.ca>
+ *              Glen W        <@uottawa.ca>
+ *              Youssef J     <yjall032@uottawa.ca>
+
  */
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {

@@ -1,4 +1,15 @@
 package com.example.seg2105termproject;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+//import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioButton;
+
 /**
  * This file is part of Course Booking application for Android devices
  *
@@ -11,17 +22,6 @@ package com.example.seg2105termproject;
  *              Youssef J     <yjall032@uottawa.ca>
  * 
 */
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-//import android.widget.Button;
-import android.widget.EditText;
-import android.widget.RadioButton;
-
 public class MainActivity extends AppCompatActivity {
 
 //    Button btnSignUp, btnSignIn;
