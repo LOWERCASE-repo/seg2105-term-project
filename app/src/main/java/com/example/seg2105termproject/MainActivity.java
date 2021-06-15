@@ -118,13 +118,9 @@ public class MainActivity extends AppCompatActivity {
         String password = editPasswordIn.getText().toString();
 
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        User desiredUser = dbHelper.getUser(username);
 
-        if (desiredUser == null){
-            // Error message: user not found.
-            Utils.createErrorDialog(this, R.string.user_not_found);
-
-        } else {
+        try {
+            User desiredUser = dbHelper.getUser(username);
 
             if (password.equals(desiredUser.getPassword())){
 
@@ -156,6 +152,9 @@ public class MainActivity extends AppCompatActivity {
             }
 
             editUsernameIn.setText("");
+
+        } catch (IllegalArgumentException e){
+            Utils.createErrorDialog(this, R.string.user_not_found);
         }
 
         editPasswordIn.setText("");
