@@ -50,10 +50,12 @@ public class InstructorActivity extends AppCompatActivity {
     private void update(Course course) {
         this.course = course;
         codeAndName.setText(course.getCourseCode() + " — " + course.getCourseName());
-        Instructor instructor = course.getInstructor();
-        if (instructor != null) {
-            tvAssignedInstructor.setText(instructor.getUsername());
+        Instructor assignedInstructor = course.getInstructor();
+        if (assignedInstructor != null) {
+            Log.d("sysout", "course update, found instructor");
+            tvAssignedInstructor.setText(assignedInstructor.getUsername());
         } else {
+            Log.d("sysout", "course update, instructor not found");
             tvAssignedInstructor.setText(R.string.blank);
         }
 
@@ -136,15 +138,10 @@ public class InstructorActivity extends AppCompatActivity {
         }
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         if (course.getInstructor() == null) {
-            Log.d("sysout", "block entered");
             course.setInstructor(instructor);
-            Log.d("sysout", "instructor set");
             dbHelper.deleteCourse(course.getCourseCode());
-            Log.d("sysout", "course deleted");
             dbHelper.addCourse(course);
-            Log.d("sysout", "course added");
             update(course);
-            Log.d("sysout", "course updated");
         } else if (course.getInstructor().equals(instructor)) {
             course.setInstructor(null);
             dbHelper.deleteCourse(course.getCourseCode());

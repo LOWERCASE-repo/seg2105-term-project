@@ -130,7 +130,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void addCourse (Course course) throws IllegalArgumentException{
 
-        Log.d("sysout", "add course called");
+//        Log.d("sysout", "add course called");
 
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
@@ -364,6 +364,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Close the cursor and database objects.
         cursor.close();
         db.close();
+
+        Log.d("sysout", "getcourse called, instructor: " + course.getInstructor().getUsername());
 
         // Return the Course.
         return course;
