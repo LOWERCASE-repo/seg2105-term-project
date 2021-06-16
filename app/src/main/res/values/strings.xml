@@ -7,11 +7,6 @@
     <string name="student">Student</string>
 
     <!-- For Sign Up/In page. -->
-    <string name="type_of_user">Type of User:</string>
-    <string name="username_label">Username:</string>
-    <string name="password_label">Password:</string>
-    <string name="repeat_pw_label">Repeat Password:</string>
-
     <string name="sign_up">Sign Up</string>
     <string name="sign_in">Sign In</string>
 
@@ -23,10 +18,6 @@
 
     <string name="delete_user">Delete User</string>
 
-    <string name="course_name_label">Course Name:</string>
-    <string name="course_code_label">Course Code:</string>
-
-
 
     <!-- Basic keywords for admins. -->
     <string name="create">Create</string>
@@ -35,6 +26,26 @@
     <string name="cancel">Cancel</string>
 
     <string name="welcome">Welcome</string>
+
+    <!-- For instructor activity -->
+    <string name="find_course_by_code">Load Course By Code</string>
+    <string name="find_course_by_name">Load Course By Name</string>
+    <string name="blank">—</string>
+    <string name="un_assign">(Un)assign</string>
+
+    <!-- Labels (labelling what information is being displayed) -->
+    <string name="type_of_user_label">Type of User:</string>
+    <string name="username_label">Username:</string>
+    <string name="password_label">Password:</string>
+    <string name="repeat_pw_label">Repeat Password:</string>
+
+    <string name="course_name_label">Course Name:</string>
+    <string name="course_code_label">Course Code:</string>
+    <string name="course_instructor_label">Course Instructor:</string>
+
+    <string name="all_courses_label">All Courses:</string>
+    <string name="selected_course_label">Selected Course:</string>
+    <string name="assigned_instructor_label">Assigned Instructor:</string>
 
     <!-- Error messages. -->
     <string name="error">Error</string>
@@ -51,9 +62,5 @@
     <string name="no_course">Please load a course first.</string>
 
     <string name="success">Success</string>
-    <string name="find_course_by_code">Load Course By Code</string>
-    <string name="find_course_by_name">Load Course By Name</string>
-    <string name="blank">—</string>
-    <string name="un_assign">(Un)assign</string>
 
 </resources>

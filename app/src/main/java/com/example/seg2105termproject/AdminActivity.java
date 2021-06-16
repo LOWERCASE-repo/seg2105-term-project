@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -84,9 +85,11 @@ public class AdminActivity extends AppCompatActivity {
         layout.setOrientation(LinearLayout.VERTICAL);
         final EditText name = new EditText(this);
         name.setHint("Name");
+        name.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
         layout.addView(name);
         final EditText code = new EditText(this);
         code.setHint("Code");
+        code.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
         layout.addView(code);
         builder.setView(layout);
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
@@ -132,9 +135,11 @@ public class AdminActivity extends AppCompatActivity {
         layout.setOrientation(LinearLayout.VERTICAL);
         final EditText oldCodeText = new EditText(this);
         oldCodeText.setHint("Old Code");
+        oldCodeText.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
         layout.addView(oldCodeText);
         final EditText newCodeText = new EditText(this);
         newCodeText.setHint("New Code");
+        newCodeText.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
         layout.addView(newCodeText);
         builder.setView(layout);
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
@@ -177,9 +182,11 @@ public class AdminActivity extends AppCompatActivity {
         layout.setOrientation(LinearLayout.VERTICAL);
         final EditText name = new EditText(this);
         name.setHint("New Name");
+        name.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
         layout.addView(name);
         final EditText code = new EditText(this);
         code.setHint("Code");
+        code.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
         layout.addView(code);
         builder.setView(layout);
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
@@ -221,6 +228,7 @@ public class AdminActivity extends AppCompatActivity {
         builder.setTitle("Delete Course");
         final EditText code = new EditText(this);
         code.setHint("Code");
+        code.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
         builder.setView(code);
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             @Override
@@ -260,6 +268,7 @@ public class AdminActivity extends AppCompatActivity {
         builder.setTitle("Delete User");
         final EditText name = new EditText(this);
         name.setHint("Username");
+        name.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
         builder.setView(name);
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             @Override

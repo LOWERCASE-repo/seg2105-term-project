@@ -21,4 +21,13 @@ public class Instructor extends User{
     public UserType getType(){
         return UserType.INSTRUCTOR;
     }
+
+    public boolean equals(Object obj){
+        if (obj == null || !(obj instanceof Instructor)){
+            return false;
+        } else {
+            Instructor other = (Instructor) obj;
+            return (this.getUsername().equals(other.getUsername()));
+        }
+    }
 }
