@@ -38,45 +38,27 @@
                 android:textSize="20sp" />
         </LinearLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <Button
-                android:id="@+id/findByCode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="findCourseByCode"
-                android:text="@string/find_course_by_code"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/findByName"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:onClick="findCourseByName"
-                android:text="@string/find_course_by_name"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/findByCode"
-                app:layout_constraintVertical_bias="0.0" />
+                android:text="@string/find_course_by_name" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <TextView
-            android:id="@+id/codeAndName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/blank"
-            android:textAlignment="center"
-            android:textSize="24sp" />
+            <Button
+                android:id="@+id/findByCode"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:onClick="findCourseByCode"
+                android:text="@string/find_course_by_code" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -98,6 +80,14 @@
                 android:onClick="toggleAssignInstructor"
                 android:text="@string/un_assign" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/codeAndName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/blank"
+            android:textAlignment="center"
+            android:textSize="24sp" />
 
     </LinearLayout>
 
