@@ -44,6 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         private static final String TABLE_NAME = "Course_Table";
         private static final String COLUMN_COURSE_NAME = "Course_Name";
         private static final String COLUMN_COURSE_CODE = "Course_Code";
+        private static final String COLUMN_COURSE_INSTRUCTOR = "Course_Instructor";
     }
 
 
@@ -61,7 +62,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + CourseTable.TABLE_NAME + " (" +
                     CourseTable._ID + " INTEGER PRIMARY KEY," +
                     CourseTable.COLUMN_COURSE_NAME + " TEXT," +
-                    CourseTable.COLUMN_COURSE_CODE + " TEXT UNIQUE)";
+                    CourseTable.COLUMN_COURSE_CODE + " TEXT UNIQUE," +
+                    CourseTable.COLUMN_COURSE_INSTRUCTOR + " TEXT)";
 
     private static final String SQL_DELETE_ACCOUNTS =
             "DROP TABLE IF EXISTS " + Accounts.TABLE_NAME;
@@ -128,6 +130,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void addCourse (Course course) throws IllegalArgumentException{
 
+        Log.d("sysout", "add course called");
+
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -135,10 +139,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(CourseTable.COLUMN_COURSE_NAME, course.getCourseName());
         values.put(CourseTable.COLUMN_COURSE_CODE, course.getCourseCode());
+        Instructor instructor = course.getInstructor();
+        if (instructor == null) {
+            values.put(CourseTable.COLUMN_COURSE_INSTRUCTOR, "");
+            Log.d("sysout", "add course null instructor");
+        } else {
+            values.put(CourseTable.COLUMN_COURSE_INSTRUCTOR, course.getInstructor().getUsername());
+            Log.d("sysout", "add course with instructor");
+        }
 
         // Insert the entry into the CourseTable table of the database, throw an error if we
         // invalidate the unique constraint.
         if (db.insert(CourseTable.TABLE_NAME, null, values) == -1) {
+            Log.d("sysout", "add course failed");
             throw new IllegalArgumentException();
         }
 
@@ -339,7 +352,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             course = new Course(
                     cursor.getInt(0),
                     cursor.getString(1),
-                    cursor.getString(2)
+                    cursor.getString(2),
+                    (Instructor)getUser(cursor.getString(3))
             );
 
         } else {

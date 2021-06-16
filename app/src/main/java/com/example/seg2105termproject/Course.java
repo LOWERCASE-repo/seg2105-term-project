@@ -13,6 +13,7 @@ package com.example.seg2105termproject;
 */
 public class Course {
 
+    private Instructor instructor;
     private int id;
     private String courseName;
     private String courseCode;
@@ -21,6 +22,13 @@ public class Course {
         this.id = id;
         this.courseName = name;
         this.courseCode = code;
+    }
+
+    public Course (int id, String name, String code, Instructor instructor){
+        this.id = id;
+        this.courseName = name;
+        this.courseCode = code;
+        this.instructor = instructor;
     }
 
     public Course (String name, String code){
@@ -42,5 +50,13 @@ public class Course {
 
     public void setCourseCode(String code){
         this.courseCode = code;
+    }
+
+    public void setInstructor(Instructor instructor) {
+        this.instructor = instructor;
+    }
+
+    public Instructor getInstructor() {
+        return instructor;
     }
 }

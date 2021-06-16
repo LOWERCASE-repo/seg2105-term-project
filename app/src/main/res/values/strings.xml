@@ -47,9 +47,13 @@
     <string name="course_not_found">Course not found.</string>
     <string name="parameters_missing">Parameter(s) are missing.</string>
     <string name="cannot_delete_self">Cannot delete self (admin).</string>
+    <string name="course_claimed">Course already claimed by another instructor.</string>
+    <string name="no_course">Please load a course first.</string>
 
     <string name="success">Success</string>
-    <string name="find_course_by_code">Find Course By Code</string>
-    <string name="find_course_by_name">Find Course By Name</string>
+    <string name="find_course_by_code">Load Course By Code</string>
+    <string name="find_course_by_name">Load Course By Name</string>
+    <string name="blank">—</string>
+    <string name="un_assign">(Un)assign</string>
 
 </resources>

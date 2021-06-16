@@ -26,7 +26,7 @@ import android.widget.TextView;
 public class InstructorActivity extends AppCompatActivity {
 
     static InstructorActivity self;
-    TextView tvInstructorName, codeAndName;
+    TextView tvInstructorName, codeAndName, tvAssignedInstructor;
     Instructor instructor;
     Course course;
 
@@ -38,6 +38,7 @@ public class InstructorActivity extends AppCompatActivity {
 
         tvInstructorName = findViewById(R.id.tvInstructorName);
         codeAndName = findViewById(R.id.codeAndName);
+        tvAssignedInstructor = findViewById(R.id.tvAssignedInstructor);
 
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         Intent intent = getIntent();
@@ -49,6 +50,13 @@ public class InstructorActivity extends AppCompatActivity {
     private void update(Course course) {
         this.course = course;
         codeAndName.setText(course.getCourseCode() + " — " + course.getCourseName());
+        Instructor instructor = course.getInstructor();
+        if (instructor != null) {
+            tvAssignedInstructor.setText(instructor.getUsername());
+        } else {
+            tvAssignedInstructor.setText(R.string.blank);
+        }
+
     }
 
     public void findCourseByName(View view) {
@@ -119,5 +127,31 @@ public class InstructorActivity extends AppCompatActivity {
         });
 
         builder.show();
+    }
+
+    public void toggleAssignInstructor(View view) {
+        if (course == null) {
+            Utils.createErrorDialog(this, R.string.no_course);
+            return;
+        }
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        if (course.getInstructor() == null) {
+            Log.d("sysout", "block entered");
+            course.setInstructor(instructor);
+            Log.d("sysout", "instructor set");
+            dbHelper.deleteCourse(course.getCourseCode());
+            Log.d("sysout", "course deleted");
+            dbHelper.addCourse(course);
+            Log.d("sysout", "course added");
+            update(course);
+            Log.d("sysout", "course updated");
+        } else if (course.getInstructor().equals(instructor)) {
+            course.setInstructor(null);
+            dbHelper.deleteCourse(course.getCourseCode());
+            dbHelper.addCourse(course);
+            update(course);
+        } else {
+            Utils.createErrorDialog(this, R.string.course_claimed);
+        }
     }
 }
