@@ -1,11 +1,14 @@
 package com.example.seg2105termproject;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -26,9 +29,12 @@ import android.widget.TextView;
 public class InstructorActivity extends AppCompatActivity {
 
     static InstructorActivity self;
-    TextView tvInstructorName, codeAndName, tvAssignedInstructor;
+    TextView tvInstructorName, tvSelectedCourse, tvAssignedInstructor;
     Instructor instructor;
     Course course;
+
+    RecyclerView instructorCoursesView;
+    CoursesViewAdapter cAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,19 +43,31 @@ public class InstructorActivity extends AppCompatActivity {
         setContentView(R.layout.activity_instructor);
 
         tvInstructorName = findViewById(R.id.tvInstructorName);
-        codeAndName = findViewById(R.id.codeAndName);
+        tvSelectedCourse = findViewById(R.id.tvSelectedCourse);
         tvAssignedInstructor = findViewById(R.id.tvAssignedInstructor);
+        instructorCoursesView = findViewById(R.id.instructorCoursesView);
 
         DatabaseHelper dbHelper = new DatabaseHelper(this);
+
+        cAdapter = new CoursesViewAdapter(dbHelper.getAllCourses());
+        LinearLayoutManager coursesLayoutManager = new LinearLayoutManager(this);
+        instructorCoursesView.setLayoutManager(coursesLayoutManager);
+        instructorCoursesView.setAdapter(cAdapter);
+
         Intent intent = getIntent();
         instructor = (Instructor) dbHelper.getUser(intent.getStringExtra(MainActivity.EXTRA_USER));
 
         tvInstructorName.setText("Welcome " + instructor.getUsername());
     }
 
+    /**
+     * Update the views on the activity.
+     * @param course    The course selected by the instructor (user).
+     */
     private void update(Course course) {
         this.course = course;
-        codeAndName.setText(course.getCourseCode() + " — " + course.getCourseName());
+        tvSelectedCourse.setText(course.getCourseCode() + " — " + course.getCourseName());
+
         Instructor assignedInstructor = course.getInstructor();
         if (assignedInstructor != null) {
             Log.d("sysout", "course update, found instructor");
@@ -59,8 +77,14 @@ public class InstructorActivity extends AppCompatActivity {
             tvAssignedInstructor.setText(R.string.blank);
         }
 
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        cAdapter.refresh(dbHelper.getAllCourses());
     }
 
+    /**
+     * Method for the onClick of btnFindByName.
+     * @param view  The view that calls this method.
+     */
     public void findCourseByName(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Find Course By Name");
@@ -68,6 +92,7 @@ public class InstructorActivity extends AppCompatActivity {
         layout.setOrientation(LinearLayout.VERTICAL);
         final EditText name = new EditText(this);
         name.setHint("Name");
+        name.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
         layout.addView(name);
         builder.setView(layout);
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
@@ -96,6 +121,10 @@ public class InstructorActivity extends AppCompatActivity {
         builder.show();
     }
 
+    /**
+     * Method for the onClick of btnFindByCode.
+     * @param view  The view that calls this method.
+     */
     public void findCourseByCode(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Find Course By Code");
@@ -103,6 +132,7 @@ public class InstructorActivity extends AppCompatActivity {
         layout.setOrientation(LinearLayout.VERTICAL);
         final EditText code = new EditText(this);
         code.setHint("Code");
+        code.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
         layout.addView(code);
         builder.setView(layout);
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
@@ -131,22 +161,37 @@ public class InstructorActivity extends AppCompatActivity {
         builder.show();
     }
 
+    /**
+     * Method for the onClick of btnToggleAssign.
+     * @param view  The view that calls this method.
+     */
     public void toggleAssignInstructor(View view) {
         if (course == null) {
             Utils.createErrorDialog(this, R.string.no_course);
             return;
         }
         DatabaseHelper dbHelper = new DatabaseHelper(this);
+
         if (course.getInstructor() == null) {
+
+            // Set the course instructor to the instructor using the app.
+            dbHelper.setCourseInstructor(course.getCourseCode(), instructor);
+
+            // To save on resources (and not call another database open), simply set the
+            // selected course's instructor and update the views.
             course.setInstructor(instructor);
-            dbHelper.deleteCourse(course.getCourseCode());
-            dbHelper.addCourse(course);
             update(course);
+
         } else if (course.getInstructor().equals(instructor)) {
+
+            // Set the course instructor to null.
+            dbHelper.setCourseInstructor(course.getCourseCode(), null);
+
+            // To save on resources (and not call another database open), simply set the
+            // selected course's instructor and update the views.
             course.setInstructor(null);
-            dbHelper.deleteCourse(course.getCourseCode());
-            dbHelper.addCourse(course);
             update(course);
+
         } else {
             Utils.createErrorDialog(this, R.string.course_claimed);
         }

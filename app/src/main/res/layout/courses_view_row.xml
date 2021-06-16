@@ -2,18 +2,71 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:background="@color/purple_500"
+    android:orientation="vertical"
+    android:padding="2dp">
 
 
-    <TextView
-        android:id="@+id/tvCNameRow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:paddingHorizontal="2dp"
+        android:paddingVertical="1dp">
 
-    <TextView
-        android:id="@+id/tvCCodeRow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" />
+        <TextView
+            android:id="@+id/tvCNameLabelRow"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:text="@string/course_name_label" />
+
+        <TextView
+            android:id="@+id/tvCNameRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:paddingHorizontal="2dp"
+        android:paddingVertical="1dp">
+
+        <TextView
+            android:id="@+id/tvCCodeLabelRow"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:text="@string/course_code_label" />
+
+        <TextView
+            android:id="@+id/tvCCodeRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:paddingHorizontal="2dp"
+        android:paddingVertical="1dp">
+
+        <TextView
+            android:id="@+id/tvCInstructorLabelRow"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:text="@string/course_instructor_label" />
+
+        <TextView
+            android:id="@+id/tvCInstructorRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 </LinearLayout>

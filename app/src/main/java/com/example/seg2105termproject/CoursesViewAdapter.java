@@ -26,13 +26,14 @@ public class CoursesViewAdapter extends RecyclerView.Adapter<CoursesViewAdapter.
     private Course[] courseDataset;
 
     public static class CourseHolder extends RecyclerView.ViewHolder{
-        private final TextView tvCNameRow, tvCCodeRow;
+        private final TextView tvCNameRow, tvCCodeRow, tvCInstructorRow;
 
         public CourseHolder (View view){
             super(view);
 
             tvCNameRow = view.findViewById(R.id.tvCNameRow);
             tvCCodeRow = view.findViewById(R.id.tvCCodeRow);
+            tvCInstructorRow = view.findViewById(R.id.tvCInstructorRow);
         }
 
         public TextView getTvCName() {
@@ -40,6 +41,8 @@ public class CoursesViewAdapter extends RecyclerView.Adapter<CoursesViewAdapter.
         }
 
         public TextView getTvCCode() { return tvCCodeRow; }
+
+        public TextView getTvCInstructorRow() { return tvCInstructorRow; }
     }
 
     public CoursesViewAdapter(Course[] dataset) { this.courseDataset = dataset; }
@@ -56,8 +59,12 @@ public class CoursesViewAdapter extends RecyclerView.Adapter<CoursesViewAdapter.
     // Laying out the text in the layout.
     @Override
     public void onBindViewHolder(CourseHolder holder, int position) {
-        holder.getTvCName().setText("Course Name: " + courseDataset[position].getCourseName());
-        holder.getTvCCode().setText("Course Code: " + courseDataset[position].getCourseCode());
+        holder.getTvCName().setText(courseDataset[position].getCourseName());
+        holder.getTvCCode().setText(courseDataset[position].getCourseCode());
+
+        Instructor instructor = courseDataset[position].getInstructor();
+        String text = instructor == null ? "-" : instructor.getUsername();
+        holder.getTvCInstructorRow().setText(text);
     }
 
     @Override

@@ -44,17 +44,5 @@ public abstract class User {
         this.password = password;
     }
 
-    // Placeholders
-    // boolean could be replaced with exceptions and proper handling.
-    // Methods could be kept here or moved to MainActivity.
-
-    public boolean signUp(String username, String password){
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean signIn(String username, String password){
-        throw new UnsupportedOperationException();
-    }
-
     public abstract UserType getType();
 }

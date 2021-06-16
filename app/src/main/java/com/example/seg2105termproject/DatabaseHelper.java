@@ -139,9 +139,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(CourseTable.COLUMN_COURSE_NAME, course.getCourseName());
         values.put(CourseTable.COLUMN_COURSE_CODE, course.getCourseCode());
+
         Instructor instructor = course.getInstructor();
         if (instructor == null) {
-            values.put(CourseTable.COLUMN_COURSE_INSTRUCTOR, "");
+            // Replace with tertiary operator when Log is removed.
+            String empty = null;
+            values.put(CourseTable.COLUMN_COURSE_INSTRUCTOR, empty);
             Log.d("sysout", "add course null instructor");
         } else {
             values.put(CourseTable.COLUMN_COURSE_INSTRUCTOR, course.getInstructor().getUsername());
@@ -249,13 +252,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(CourseTable.COLUMN_COURSE_CODE, newCode);
         db.update(CourseTable.TABLE_NAME, values, CourseTable._ID + " = ?", new String[]{id});
+        db.close();
     }
 
     /**
      * Change the course name, with validation
      * @param code The current course code
      * @param newName The new course code.
-     * @throws IllegalArgumentException if course is not found, or new course code already exists
+     * @throws IllegalArgumentException if course is not found.
      */
     public void changeCourseName (String code, String newName) throws IllegalArgumentException{
         // Get reference to writable database.
@@ -280,6 +284,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(CourseTable.COLUMN_COURSE_NAME, newName);
         db.update(CourseTable.TABLE_NAME, values, CourseTable._ID + " = ?", new String[]{id});
+        db.close();
+    }
+
+    /**
+     * Sets the Instructor of a Course to the passed Instructor.
+     * @param code          The code of the course which needs its instructor updated.
+     * @param instructor    The instructor to set for the course.
+     * @throws IllegalArgumentException if course is not found.
+     */
+    public void setCourseInstructor(String code, Instructor instructor) throws IllegalArgumentException{
+        // Get reference to writable database.
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Check if the course is in the database
+        Cursor cursor = db.rawQuery(String.format("SELECT _ID FROM %s WHERE %s = \"%s\"",
+                CourseTable.TABLE_NAME, CourseTable.COLUMN_COURSE_CODE, code), null);
+
+        // Make sure that the check was successful
+        if (!cursor.moveToFirst()) {
+            throw new IllegalArgumentException();
+        }
+
+        // We'll use the id returned by the check
+        String id = String.valueOf(cursor.getInt(0));
+
+        // Close the cursor
+        cursor.close();
+
+        // Create the variable to hold the update info, then execute the update.
+        ContentValues values = new ContentValues();
+        String instructorName = instructor == null ? null : instructor.getUsername();
+        values.put(CourseTable.COLUMN_COURSE_INSTRUCTOR, instructorName);
+        db.update(CourseTable.TABLE_NAME,
+                values,
+                CourseTable._ID + " = ?",
+                new String[]{id});
     }
 
     /**
@@ -348,13 +388,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // If the Course was found,
         if (cursor.moveToFirst()){
 
-            // Construct the course object.
-            course = new Course(
-                    cursor.getInt(0),
-                    cursor.getString(1),
-                    cursor.getString(2),
-                    (Instructor)getUser(cursor.getString(3))
-            );
+            // Construct the Course.
+            course = constructCourse(cursor);
 
         } else {
             // If the course was not found, throw exception.
@@ -365,7 +400,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
 
-        Log.d("sysout", "getcourse called, instructor: " + course.getInstructor().getUsername());
+//        Log.d("sysout", "getcourse called, instructor: " + course.getInstructor().getUsername());
 
         // Return the Course.
         return course;
@@ -397,11 +432,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()){
 
             // Construct the course object.
-            course = new Course(
-                    cursor.getInt(0),
-                    cursor.getString(1),
-                    cursor.getString(2)
-            );
+            course = constructCourse(cursor);
 
         } else {
             // If the course was not found, throw exception.
@@ -461,11 +492,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             courses = new Course[cursor.getCount()];
 
             do {
-                courses[i++] = new Course(
-                        Integer.parseInt(cursor.getString(0)),
-                        cursor.getString(1),
-                        cursor.getString(2)
-                );
+                courses[i++] = constructCourse(cursor);
 
             } while (cursor.moveToNext());
 
@@ -530,5 +557,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Return the instantiated user subclass.
         return user;
+    }
+
+    /**
+     * Constructs and returns the reference to the Course object the passed cursor
+     * object is pointing at.
+     * @param cursor    The cursor object that currently points at the desired course in the
+     *                  database.
+     * @return  The reference to the Course object that the cursor is pointing at.
+     */
+    public Course constructCourse(Cursor cursor){
+        // Check if instructor for the course exists.
+        Instructor instructor;
+
+        try {
+            // Get the Instructor object from the database
+            // (i.e. confirm Instructor is in database).
+            instructor = (Instructor) getUser(cursor.getString(3));
+        } catch (IllegalArgumentException e){
+
+            // Thrown exception means not found.
+            instructor = null;
+        }
+
+        // Create the course.
+        return new Course(
+                Integer.parseInt(cursor.getString(0)),
+                cursor.getString(1),
+                cursor.getString(2),
+                instructor
+        );
     }
 }

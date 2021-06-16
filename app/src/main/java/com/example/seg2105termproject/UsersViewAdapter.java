@@ -50,8 +50,8 @@ public class UsersViewAdapter extends RecyclerView.Adapter<UsersViewAdapter.User
 
     @Override
     public void onBindViewHolder(UsersViewAdapter.UserHolder holder, int position) {
-        holder.getTvUTypeRow().setText("User Type: " + usersDataset[position].getType().toString());
-        holder.getTvUNameRow().setText("Name: " + usersDataset[position].getUsername());
+        holder.getTvUTypeRow().setText(usersDataset[position].getType().toString());
+        holder.getTvUNameRow().setText(usersDataset[position].getUsername());
     }
 
     @Override
