@@ -40,16 +40,15 @@
   <component name="ChangeListManager">
     <list default="true" id="57bee9d9-4b3d-4be4-809a-78c4f933fd4a" name="Default Changelist" comment="all admin actions working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/AdminActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/AdminActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/DatabaseHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/DatabaseHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/seg2105termproject/MainActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_instructor.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_instructor.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[VirtualDevicePath@C:\Users\Salsa\.android\avd\Pixel_3a_API_30_x86.avd]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[VirtualDevicePath@C:\Users\LOWERCASE\.android\avd\Pixel_3a_API_30_x86.avd]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -93,7 +92,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="jerrys-branch" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -255,10 +254,10 @@
       <screen x="82" y="0" width="1454" height="864" />
     </state>
     <state x="175" y="93" width="1268" height="678" key="AVDManager/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623367962255" />
-    <state x="636" y="149" key="AndroidCreateXmlResourceDialog" timestamp="1623366809716">
+    <state x="636" y="149" key="AndroidCreateXmlResourceDialog" timestamp="1623862923506">
       <screen x="82" y="0" width="1454" height="864" />
     </state>
-    <state x="636" y="149" key="AndroidCreateXmlResourceDialog/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623366809716" />
+    <state x="636" y="149" key="AndroidCreateXmlResourceDialog/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623862923506" />
     <state x="752" y="266" key="AndroidProcessChooserDialog" timestamp="1623521542418">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -307,6 +306,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="282" key="GridCell.Tab.1.right/0.0.1920.1040/-1920.0.1920.1040@0.0.1920.1040" timestamp="1623519553239" />
+    <state x="184" y="48" key="IDE.errors.dialog" timestamp="1623863313812">
+      <screen x="82" y="0" width="1454" height="864" />
+    </state>
+    <state x="184" y="48" key="IDE.errors.dialog/2482.0.1838.1080/82.0.1454.864@82.0.1454.864" timestamp="1623863313812" />
     <state x="299" y="14" key="RollbackChangesDialog" timestamp="1623366306598">
       <screen x="82" y="0" width="1454" height="864" />
     </state>

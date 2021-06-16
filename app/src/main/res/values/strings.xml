@@ -49,5 +49,7 @@
     <string name="cannot_delete_self">Cannot delete self (admin).</string>
 
     <string name="success">Success</string>
+    <string name="find_course_by_code">Find Course By Code</string>
+    <string name="find_course_by_name">Find Course By Name</string>
 
 </resources>
