@@ -59,8 +59,8 @@ public class CoursesViewAdapter extends RecyclerView.Adapter<CoursesViewAdapter.
     // Laying out the text in the layout.
     @Override
     public void onBindViewHolder(CourseHolder holder, int position) {
-        holder.getTvCName().setText(courseDataset[position].getCourseName());
-        holder.getTvCCode().setText(courseDataset[position].getCourseCode());
+        holder.getTvCName().setText(courseDataset[position].getName());
+        holder.getTvCCode().setText(courseDataset[position].getCode());
 
         Instructor instructor = courseDataset[position].getInstructor();
         String text = instructor == null ? "-" : instructor.getUsername();

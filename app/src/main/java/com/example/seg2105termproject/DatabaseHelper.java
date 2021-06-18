@@ -7,6 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import android.util.Log;
+
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+
 /**
  * This file is part of Course Booking application for Android devices
  *
@@ -20,10 +24,6 @@ import android.util.Log;
  * 
 */
 public class DatabaseHelper extends SQLiteOpenHelper {
-
-    // Just a thought: for better exception usage, perhaps consider changing
-    // IllegalArgumentExceptions to NoSuchElementExceptions for Deliverable 2 & 3.
-    // Only thought of this on June 14th. -Jerry S
 
     /**
      * Nested classes to define and contain table details.
@@ -45,6 +45,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         private static final String COLUMN_COURSE_NAME = "Course_Name";
         private static final String COLUMN_COURSE_CODE = "Course_Code";
         private static final String COLUMN_COURSE_INSTRUCTOR = "Course_Instructor";
+        private static final String COLUMN_COURSE_DAYS = "Course_Days";
+        private static final String COLUMN_COURSE_START_TIMES = "Course_Start_Times";
+        private static final String COLUMN_COURSE_END_TIMES = "Course_End_Times";
+        private static final String COLUMN_COURSE_DESC = "Course_Description";
+        private static final String COLUMN_COURSE_CAPACITY = "Course_Capacity";
     }
 
 
@@ -63,13 +68,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     CourseTable._ID + " INTEGER PRIMARY KEY," +
                     CourseTable.COLUMN_COURSE_NAME + " TEXT," +
                     CourseTable.COLUMN_COURSE_CODE + " TEXT UNIQUE," +
-                    CourseTable.COLUMN_COURSE_INSTRUCTOR + " TEXT)";
+                    CourseTable.COLUMN_COURSE_INSTRUCTOR + " TEXT," +
+                    CourseTable.COLUMN_COURSE_DAYS + " TEXT," +
+                    CourseTable.COLUMN_COURSE_START_TIMES + " TEXT," +
+                    CourseTable.COLUMN_COURSE_END_TIMES + " TEXT," +
+                    CourseTable.COLUMN_COURSE_DESC + " TEXT," +
+                    CourseTable.COLUMN_COURSE_CAPACITY + " INTEGER)";
 
     private static final String SQL_DELETE_ACCOUNTS =
             "DROP TABLE IF EXISTS " + Accounts.TABLE_NAME;
 
     private static final String SQL_DELETE_COURSETABLE =
             "DROP TABLE IF EXISTS " + CourseTable.TABLE_NAME;
+
+    /**
+     * A string constant of null to add null string values to ContentValues objects.
+     */
+    private static final String EMPTY = null;
 
     /**
      * The following are standard constants and methods for the OpenHelper.
@@ -137,19 +152,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Put values of Course object into container object.
         ContentValues values = new ContentValues();
-        values.put(CourseTable.COLUMN_COURSE_NAME, course.getCourseName());
-        values.put(CourseTable.COLUMN_COURSE_CODE, course.getCourseCode());
+        values.put(CourseTable.COLUMN_COURSE_NAME, course.getName());
+        values.put(CourseTable.COLUMN_COURSE_CODE, course.getCode());
 
         Instructor instructor = course.getInstructor();
         if (instructor == null) {
             // Replace with tertiary operator when Log is removed.
-            String empty = null;
-            values.put(CourseTable.COLUMN_COURSE_INSTRUCTOR, empty);
+            values.put(CourseTable.COLUMN_COURSE_INSTRUCTOR, EMPTY);
             Log.d("sysout", "add course null instructor");
         } else {
             values.put(CourseTable.COLUMN_COURSE_INSTRUCTOR, course.getInstructor().getUsername());
             Log.d("sysout", "add course with instructor");
         }
+
+        values.put(CourseTable.COLUMN_COURSE_DAYS, Utils.daysToString(course.getDays()));
+        values.put(CourseTable.COLUMN_COURSE_START_TIMES, Utils.timesToString(course.getStartTimes()));
+        values.put(CourseTable.COLUMN_COURSE_END_TIMES, Utils.timesToString(course.getEndTimes()));
+        values.put(CourseTable.COLUMN_COURSE_DESC, course.getDescription());
+        values.put(CourseTable.COLUMN_COURSE_CAPACITY, course.getCapacity());
 
         // Insert the entry into the CourseTable table of the database, throw an error if we
         // invalidate the unique constraint.
@@ -167,18 +187,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param username  The username string of the User that should be deleted.
      * @throws IllegalArgumentException if deletion was not successful
      */
-    public void deleteUser (String username){
+    public void deleteUser (String username) throws IllegalArgumentException{
 
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
 
         String[] selectionArgs = {username};
 
-        // Query the database to delete the User, throw an exception if 0 rows were affected.
+        // Query the database to delete the User.
         int result = db.delete(
                 Accounts.TABLE_NAME,
                 Accounts.COLUMN_USERNAME + " LIKE ?",
                 selectionArgs);
+
+        // Delete the course details of courses the instructor was teaching.
+        // Does not affect any course if a Student is deleted, since all usernames are unique.
+        ContentValues values = new ContentValues();
+        values.put(CourseTable.COLUMN_COURSE_INSTRUCTOR, EMPTY);
+        values.put(CourseTable.COLUMN_COURSE_DAYS, EMPTY);
+        values.put(CourseTable.COLUMN_COURSE_START_TIMES, EMPTY);
+        values.put(CourseTable.COLUMN_COURSE_END_TIMES, EMPTY);
+        values.put(CourseTable.COLUMN_COURSE_DESC, EMPTY);
+        values.put(CourseTable.COLUMN_COURSE_CAPACITY, 0);
+
+        db.update(
+                CourseTable.TABLE_NAME,
+                values,
+                CourseTable.COLUMN_COURSE_INSTRUCTOR + " = ?",
+                new String[]{username}
+        );
 
         // Regardless of success or not, close the database.
         db.close();
@@ -207,7 +244,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Regardless of success or not, close the database.
         db.close();
 
-        // if we didn't modify any rows, show error message
+        // If we didn't modify any rows, the course was not found. Throw the exception.
         if (result == 0) throw new IllegalArgumentException();
     }
 
@@ -221,23 +258,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
 
-        // Check if the course is in the database
-        Cursor cursor = db.rawQuery(String.format("SELECT _ID FROM %s WHERE %s = \"%s\"",
-                CourseTable.TABLE_NAME, CourseTable.COLUMN_COURSE_CODE, oldCode), null);
-
-        // Make sure that the check was successful
-        if (!cursor.moveToFirst()) {
-            throw new IllegalArgumentException(String.valueOf(R.string.course_not_found));
-        }
-
-        // We'll use the id returned by the check
-        String id = String.valueOf(cursor.getInt(0));
-
-        // Close the cursor
-        cursor.close();
-
         // Check that the new code isn't being used
-        cursor = db.rawQuery(String.format("SELECT _ID FROM %s WHERE %s = \"%s\"",
+        Cursor cursor = db.rawQuery(String.format("SELECT _ID FROM %s WHERE %s = \"%s\"",
                 CourseTable.TABLE_NAME, CourseTable.COLUMN_COURSE_CODE, newCode), null);
 
         // Make sure the check was successful
@@ -245,14 +267,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             throw new IllegalArgumentException(String.valueOf(R.string.course_already_exists));
         }
 
-        // Close the cursor
+        // Close the cursor.
         cursor.close();
 
         // Create the variable to hold the update info, and execute the update.
         ContentValues values = new ContentValues();
         values.put(CourseTable.COLUMN_COURSE_CODE, newCode);
-        db.update(CourseTable.TABLE_NAME, values, CourseTable._ID + " = ?", new String[]{id});
+
+        int result = db.update(
+                CourseTable.TABLE_NAME,
+                values,
+                CourseTable.COLUMN_COURSE_CODE + " = ?",
+                new String[]{oldCode});
+
+        // Close the database.
         db.close();
+
+        // If we didn't modify any rows, the course was not found. Throw the exception.
+        if (result == 0) throw new IllegalArgumentException();
     }
 
     /**
@@ -265,61 +297,158 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
 
-        // Check if the course is in the database
-        Cursor cursor = db.rawQuery(String.format("SELECT _ID FROM %s WHERE %s = \"%s\"",
-                CourseTable.TABLE_NAME, CourseTable.COLUMN_COURSE_CODE, code), null);
-
-        // Make sure that the check was successful
-        if (!cursor.moveToFirst()) {
-            throw new IllegalArgumentException();
-        }
-
-        // We'll use the id returned by the check
-        String id = String.valueOf(cursor.getInt(0));
-
-        // Close the cursor
-        cursor.close();
-
         // Create the variable to hold the update info, then execute the update.
         ContentValues values = new ContentValues();
         values.put(CourseTable.COLUMN_COURSE_NAME, newName);
-        db.update(CourseTable.TABLE_NAME, values, CourseTable._ID + " = ?", new String[]{id});
+
+        int result = db.update(
+                CourseTable.TABLE_NAME,
+                values,
+                CourseTable.COLUMN_COURSE_CODE + " LIKE ?",
+                new String[]{code});
+
+        // Close the database.
         db.close();
+
+        // If we didn't modify any rows, the course was not found. Throw the exception.
+        if (result == 0) throw new IllegalArgumentException();
     }
 
     /**
-     * Sets the Instructor of a Course to the passed Instructor.
+     * Change the Instructor of the specified Course to the passed Instructor.
      * @param code          The code of the course which needs its instructor updated.
-     * @param instructor    The instructor to set for the course.
+     * @param instructor    The instructor to set for the course. Can be null.
      * @throws IllegalArgumentException if course is not found.
      */
-    public void setCourseInstructor(String code, Instructor instructor) throws IllegalArgumentException{
+    public void changeCourseInstructor(String code, Instructor instructor) throws IllegalArgumentException{
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
 
-        // Check if the course is in the database
-        Cursor cursor = db.rawQuery(String.format("SELECT _ID FROM %s WHERE %s = \"%s\"",
-                CourseTable.TABLE_NAME, CourseTable.COLUMN_COURSE_CODE, code), null);
+        // Create the variable to hold the update info, then execute the update.
+        ContentValues values = new ContentValues();
 
-        // Make sure that the check was successful
-        if (!cursor.moveToFirst()) {
-            throw new IllegalArgumentException();
+        // If deleting the instructor,
+        if (instructor == null){
+
+            // delete the course details of courses the instructor was teaching.
+            values.put(CourseTable.COLUMN_COURSE_INSTRUCTOR, EMPTY);
+            values.put(CourseTable.COLUMN_COURSE_DAYS, EMPTY);
+            values.put(CourseTable.COLUMN_COURSE_START_TIMES, EMPTY);
+            values.put(CourseTable.COLUMN_COURSE_END_TIMES, EMPTY);
+            values.put(CourseTable.COLUMN_COURSE_DESC, EMPTY);
+            values.put(CourseTable.COLUMN_COURSE_CAPACITY, 0);
+
+        } else {
+            values.put(CourseTable.COLUMN_COURSE_INSTRUCTOR, instructor.getUsername());
         }
 
-        // We'll use the id returned by the check
-        String id = String.valueOf(cursor.getInt(0));
 
-        // Close the cursor
-        cursor.close();
+        int result = db.update(
+                CourseTable.TABLE_NAME,
+                values,
+                CourseTable.COLUMN_COURSE_CODE + " = ?",
+                new String[]{code});
+
+        // Close the database.
+        db.close();
+
+        // If we didn't modify any rows, the course was not found. Throw the exception.
+        if (result == 0) throw new IllegalArgumentException();
+    }
+
+    /**
+     * Change the course times (weekdays, start and end times of said weekdays) of the specified
+     * Course to the passed times.
+     * The start and end times, kept in their respective array parameters, correspond to the days
+     * of the week, kept in the days array parameter.
+     * Together, they form a period of time of when the course is active.
+     * @param code          The code of the course which needs its times updated.
+     * @param days          The days of the week the course is active.
+     * @param startTimes    The time of the day when the course starts.
+     * @param endTimes      The time of the day when the course ends.
+     * @throws IllegalArgumentException if course is not found or if parameter arrays are not
+     *                                  the same length.
+     */
+    public void changeCourseTimes(String code, DayOfWeek[] days, LocalTime[] startTimes, LocalTime[] endTimes) throws IllegalArgumentException{
+        // If the arrays are not of the same length, throw exception.
+        if (days.length != startTimes.length || days.length != endTimes.length){
+            throw new IllegalArgumentException("Course time arrays are not the same length.");
+        }
+
+        // Get reference to writable database.
+        SQLiteDatabase db = this.getWritableDatabase();
 
         // Create the variable to hold the update info, then execute the update.
         ContentValues values = new ContentValues();
-        String instructorName = instructor == null ? null : instructor.getUsername();
-        values.put(CourseTable.COLUMN_COURSE_INSTRUCTOR, instructorName);
-        db.update(CourseTable.TABLE_NAME,
+        values.put(CourseTable.COLUMN_COURSE_DAYS, Utils.daysToString(days));
+        values.put(CourseTable.COLUMN_COURSE_START_TIMES, Utils.timesToString(startTimes));
+        values.put(CourseTable.COLUMN_COURSE_END_TIMES, Utils.timesToString(endTimes));
+
+        int result = db.update(
+                CourseTable.TABLE_NAME,
                 values,
-                CourseTable._ID + " = ?",
-                new String[]{id});
+                CourseTable.COLUMN_COURSE_CODE + " = ?",
+                new String[]{code});
+
+        // Close the database.
+        db.close();
+
+        // If we didn't modify any rows, the course was not found. Throw the exception.
+        if (result == 0) throw new IllegalArgumentException();
+    }
+
+    /**
+     * Change the description of the specified Course to the passed description string.
+     * @param code      The code of the Course which needs its description updated.
+     * @param newDesc   The new description of the Course.
+     * @throws IllegalArgumentException if course is not found.
+     */
+    public void changeCourseDesc(String code, String newDesc) throws IllegalArgumentException{
+        // Get reference to writable database.
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Create the variable to hold the update info, then execute the update.
+        ContentValues values = new ContentValues();
+        values.put(CourseTable.COLUMN_COURSE_DESC, newDesc);
+
+        int result = db.update(
+                CourseTable.TABLE_NAME,
+                values,
+                CourseTable.COLUMN_COURSE_CODE + " = ?",
+                new String[]{code});
+
+        // Close the database.
+        db.close();
+
+        // If we didn't modify any rows, the course was not found. Throw the exception.
+        if (result == 0) throw new IllegalArgumentException();
+    }
+
+    /**
+     * Change the capacity of a specified Course to the passed capacity integer.
+     * @param code          The code of the Course which needs its capacity updated.
+     * @param newCapacity   The new capacity (integer) of the Course.
+     * @throws IllegalArgumentException if course is not found.
+     */
+    public void changeCourseCapacity(String code, int newCapacity) throws IllegalArgumentException{
+        // Get reference to writable database.
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Create the variable to hold the update info, then execute the update.
+        ContentValues values = new ContentValues();
+        values.put(CourseTable.COLUMN_COURSE_CAPACITY, newCapacity);
+
+        int result = db.update(
+                CourseTable.TABLE_NAME,
+                values,
+                CourseTable.COLUMN_COURSE_CODE + " = ?",
+                new String[]{code});
+
+        // Close the database.
+        db.close();
+
+        // If we didn't modify any rows, the course was not found. Throw the exception.
+        if (result == 0) throw new IllegalArgumentException();
     }
 
     /**
@@ -585,7 +714,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Integer.parseInt(cursor.getString(0)),
                 cursor.getString(1),
                 cursor.getString(2),
-                instructor
+                instructor,
+                Utils.parseDays(cursor.getString(4)),
+                Utils.parseTimes(cursor.getString(5)),
+                Utils.parseTimes(cursor.getString(6)),
+                cursor.getString(7),
+                Integer.parseInt(cursor.getString(8))
         );
     }
 }

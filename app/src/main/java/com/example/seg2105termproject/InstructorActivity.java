@@ -66,7 +66,7 @@ public class InstructorActivity extends AppCompatActivity {
      */
     private void update(Course course) {
         this.course = course;
-        tvSelectedCourse.setText(course.getCourseCode() + " — " + course.getCourseName());
+        tvSelectedCourse.setText(course.getCode() + " — " + course.getName());
 
         Instructor assignedInstructor = course.getInstructor();
         if (assignedInstructor != null) {
@@ -175,7 +175,7 @@ public class InstructorActivity extends AppCompatActivity {
         if (course.getInstructor() == null) {
 
             // Set the course instructor to the instructor using the app.
-            dbHelper.setCourseInstructor(course.getCourseCode(), instructor);
+            dbHelper.changeCourseInstructor(course.getCode(), instructor);
 
             // To save on resources (and not call another database open), simply set the
             // selected course's instructor and update the views.
@@ -185,7 +185,7 @@ public class InstructorActivity extends AppCompatActivity {
         } else if (course.getInstructor().equals(instructor)) {
 
             // Set the course instructor to null.
-            dbHelper.setCourseInstructor(course.getCourseCode(), null);
+            dbHelper.changeCourseInstructor(course.getCode(), null);
 
             // To save on resources (and not call another database open), simply set the
             // selected course's instructor and update the views.
