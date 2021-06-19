@@ -155,7 +155,7 @@ public class AdminActivity extends AppCompatActivity {
                     }
                     dbHelper.changeCourseCode(oldCodeText.getText().toString(), newCodeText.getText().toString());
                 } catch (IllegalArgumentException e) {
-                    Utils.createErrorDialog(self, Integer.parseInt(e.getMessage()));
+                    Utils.createErrorDialog(self, R.string.course_not_found);
                 }
 
                 self.refreshViews();

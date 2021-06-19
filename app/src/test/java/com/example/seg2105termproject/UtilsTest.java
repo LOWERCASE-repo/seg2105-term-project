@@ -69,4 +69,21 @@ public class UtilsTest {
         assertArrayEquals(days, new DayOfWeek[]{});
         assertArrayEquals(times, new LocalTime[]{});
     }
+
+    @Test
+    public void testUserEquals(){
+        Student Jimmy1 = new Student("Jimmy", "1423");
+        Student Jimmy2 = new Student("Jimmy", "1423");
+        Student Tommy = new Student("Tommy", "password");
+        Instructor Jimmy3 = new Instructor("Jimmy", "1423");
+        Instructor Jimmy4 = new Instructor("Jimmy", "1423");
+        Admin admin = new Admin("admin", "admin123");
+        Admin admin2 = new Admin("admin", "admin123");
+
+        assertEquals(Jimmy1, Jimmy2);
+        assertNotEquals(Jimmy1, Tommy);
+        assertNotEquals(Jimmy1, Jimmy3);
+        assertEquals(Jimmy3, Jimmy4);
+        assertEquals(admin, admin2);
+    }
 }

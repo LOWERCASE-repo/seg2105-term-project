@@ -35,7 +35,15 @@ public class Utils {
         dialog.show();
     }
 
-    public static String daysToString(DayOfWeek[] days){
+    /**
+     * Converts an array of DayOfWeek (an enumeration of the days of the week) into
+     * a formatted string.
+     * @param days  The array of the DayOfWeek enum.
+     * @return  A string in the format of "-DAY,-DAY,...,-DAY,"
+     * @throws NullPointerException if a null reference is contained in the DayOfWeek
+     *                              array parameter.
+     */
+    public static String daysToString(DayOfWeek[] days) throws NullPointerException{
         if (days == null){
             return "";
         }
@@ -43,6 +51,8 @@ public class Utils {
         StringBuffer buffer = new StringBuffer();
 
         for (int i = 0; i < days.length; i++){
+            if (days[i] == null) throw new NullPointerException();
+
             buffer.append(days[i].toString());
             buffer.append(",");
         }
@@ -50,7 +60,16 @@ public class Utils {
         return buffer.toString();
     }
 
-    public static String timesToString(LocalTime[] times){
+    /**
+     * Converts an array of LocalTime objects (an object representing a time of the day)
+     * into a formatted string.
+     * @param times The array of LocalTime objects.
+     * @return  A string in the format of "HH:mm,HH:mm,...,HH:mm,"
+     *          (in other words, in ISO_LOCAL_TIME format with commas after each entry).
+     * @throws NullPointerException if a null reference is contained in the LocalTime
+     *                              array parameter.
+     */
+    public static String timesToString(LocalTime[] times) throws NullPointerException{
         if (times == null){
             return "";
         }
@@ -58,6 +77,8 @@ public class Utils {
         StringBuffer buffer = new StringBuffer();
 
         for (int i = 0; i < times.length; i++){
+            if (times[i] == null) throw new NullPointerException();
+
             buffer.append(times[i].toString());
             buffer.append(",");
         }
@@ -65,6 +86,13 @@ public class Utils {
         return buffer.toString();
     }
 
+    /**
+     * Parses a string, formatted from Utils.daysToString, and returns the equivalent
+     * array of DayOfWeek enums.
+     * @param strDays   The string formatted as "-DAY,-DAY,...,-DAY,".
+     * @return  The DayOfWeek array that is equivalent to the days of the week
+     *          listed in the string.
+     */
     public static DayOfWeek[] parseDays(String strDays){
         if (strDays == null){
             return new DayOfWeek[0];
@@ -83,6 +111,13 @@ public class Utils {
         return days.toArray(new DayOfWeek[]{});
     }
 
+    /**
+     * Parses a string, formatted from Utils.timesToString, and returns the equivalent
+     * array of LocalTime objects.
+     * @param strTimes  The string formatted as "HH:mm,HH:mm,...,HH:mm,".
+     * @return  The LocalTime array that is equivalent to the times of the day
+     *          listed in the string.
+     */
     public static LocalTime[] parseTimes(String strTimes){
         if (strTimes == null){
             return new LocalTime[0];

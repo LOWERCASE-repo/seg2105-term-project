@@ -45,4 +45,17 @@ public abstract class User {
     }
 
     public abstract UserType getType();
+
+    public boolean equals(Object other){
+        if (other == null || this.getClass() != other.getClass()){
+            return false;
+        }
+
+        User user = (User) other;
+
+        return this.id == user.id &&
+                this.username.equals(user.username) &&
+                this.password.equals(user.password) &&
+                this.getType().equals(user.getType());
+    }
 }
