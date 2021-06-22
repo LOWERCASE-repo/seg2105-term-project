@@ -29,7 +29,7 @@ import android.widget.TextView;
 public class InstructorActivity extends AppCompatActivity {
 
     static InstructorActivity self;
-    TextView tvInstructorName, tvSelectedCourse, tvAssignedInstructor;
+    TextView tvInstructorName, tvSelectedCourse, tvAssignedInstructor, tvCapacity, tvDescription;
     Instructor instructor;
     Course course;
 
@@ -45,6 +45,8 @@ public class InstructorActivity extends AppCompatActivity {
         tvInstructorName = findViewById(R.id.tvInstructorName);
         tvSelectedCourse = findViewById(R.id.tvSelectedCourse);
         tvAssignedInstructor = findViewById(R.id.tvAssignedInstructor);
+        tvCapacity = findViewById(R.id.tvCapacity);
+        tvDescription = findViewById(R.id.tvDescription);
         instructorCoursesView = findViewById(R.id.instructorCoursesView);
 
         DatabaseHelper dbHelper = new DatabaseHelper(this);
@@ -58,6 +60,7 @@ public class InstructorActivity extends AppCompatActivity {
         instructor = (Instructor) dbHelper.getUser(intent.getStringExtra(MainActivity.EXTRA_USER));
 
         tvInstructorName.setText("Welcome " + instructor.getUsername());
+        Log.d("sysout", "instructor loaded");
     }
 
     /**
@@ -67,6 +70,14 @@ public class InstructorActivity extends AppCompatActivity {
     private void update(Course course) {
         this.course = course;
         tvSelectedCourse.setText(course.getCode() + " — " + course.getName());
+
+        tvCapacity.setText("" + course.getCapacity());
+        tvDescription.setText(course.getDescription());
+//        String desc = course.getDescription();
+//        Log.d("sysout", "got here");
+//        if (desc.equals("") || desc == null) tvDescription.setText("—");
+//        else tvDescription.setText(desc);
+//        Log.d("sysout", "crash");
 
         Instructor assignedInstructor = course.getInstructor();
         if (assignedInstructor != null) {
@@ -195,5 +206,38 @@ public class InstructorActivity extends AppCompatActivity {
         } else {
             Utils.createErrorDialog(this, R.string.course_claimed);
         }
+    }
+
+    /**
+     * Method for the onClick of btnUpdateCapDesc.
+     * @param view  The view that calls this method.
+     */
+    public void updateCapDesc(View view) {
+        if (course == null) {
+            Utils.createErrorDialog(this, R.string.no_course);
+            return;
+        }
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+
+        Log.d("sysout", "update cd called");
+
+        if (tvCapacity.getText().toString() != null && !tvCapacity.getText().toString().equals("") && !tvCapacity.getText().toString().equals("—")) {
+            int newCapacity = Integer.parseInt(tvCapacity.getText().toString()); // TODO trycatch this
+            if (newCapacity > 0) {
+                dbHelper.changeCourseCapacity(course.getCode(), newCapacity);
+                course.setCapacity(newCapacity);
+            } else {
+                Utils.createErrorDialog(this, R.string.negative_capacity);
+                tvCapacity.setText(course.getCapacity());
+            }
+        } else {
+            Utils.createErrorDialog(this, R.string.missing_fields);
+        }
+
+
+        String newDescription = tvDescription.getText().toString();
+        dbHelper.changeCourseDesc(course.getCode(), newDescription);
+        course.setDescription(newDescription);
+        update(course);
     }
 }

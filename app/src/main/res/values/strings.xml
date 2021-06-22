@@ -60,7 +60,11 @@
     <string name="cannot_delete_self">Cannot delete self (admin).</string>
     <string name="course_claimed">Course already claimed by another instructor.</string>
     <string name="no_course">Please load a course first.</string>
+    <string name="negative_capacity">Course capacity can\'t be negative.</string>
 
     <string name="success">Success</string>
+    <string name="capacity">Capacity:</string>
+    <string name="update">Update</string>
+    <string name="description">Description:</string>
 
 </resources>
