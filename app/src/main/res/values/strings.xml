@@ -32,6 +32,7 @@
     <string name="find_course_by_name">Load Course By Name</string>
     <string name="blank">—</string>
     <string name="un_assign">(Un)assign</string>
+    <string name="edit_timetable">Edit Course Timetable</string>
 
     <!-- Labels (labelling what information is being displayed) -->
     <string name="type_of_user_label">Type of User:</string>
