@@ -34,6 +34,24 @@
     <string name="un_assign">(Un)assign</string>
     <string name="edit_timetable">Edit Course Timetable</string>
 
+    <!-- For timetable activity -->
+    <string name="timetable">Timetable</string>
+    <string name="add_timeslot">Add Timeslot</string>
+    <string name="edit_timeslot">Edit Timeslot</string>
+    <string name="back_to_courses">Back to courses</string>
+    <string name="save_timeslot">Save Timeslot</string>
+    <string name="delete_timeslot">Delete Timeslot</string>
+
+    <string-array name="days_of_week">
+        <item name="monday">Monday</item>
+        <item name="tuesday">Tuesday</item>
+        <item name="wednesday">Wednesday</item>
+        <item name="thursday">Thursday</item>
+        <item name="friday">Friday</item>
+        <item name="saturday">Saturday</item>
+        <item name="sunday">Sunday</item>
+    </string-array>
+
     <!-- Labels (labelling what information is being displayed) -->
     <string name="type_of_user_label">Type of User:</string>
     <string name="username_label">Username:</string>
@@ -47,6 +65,12 @@
     <string name="all_courses_label">All Courses:</string>
     <string name="selected_course_label">Selected Course:</string>
     <string name="assigned_instructor_label">Assigned Instructor:</string>
+
+    <string name="timetable_edit_label">Select a timeslot to edit it:</string>
+    <string name="day_label">Day:</string>
+    <string name="timeslot_label">Timeslot:</string>
+    <string name="day_select_label">Select day of the week:</string>
+    <string name="time_select_label">Select time:</string>
 
     <!-- Error messages. -->
     <string name="error">Error</string>
