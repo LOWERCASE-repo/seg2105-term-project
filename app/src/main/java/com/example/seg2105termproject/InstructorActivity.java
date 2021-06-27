@@ -28,8 +28,11 @@ import android.widget.TextView;
 */
 public class InstructorActivity extends AppCompatActivity {
 
+    public static final String SELECTED_COURSE = "com.example.seg2105termproject.COURSE";
+
     static InstructorActivity self;
-    TextView tvInstructorName, tvSelectedCourse, tvAssignedInstructor, tvCapacity, tvDescription;
+    TextView tvInstructorName, tvSelectedCourse, tvAssignedInstructor;
+    EditText editCapacity, editDescription;
     Instructor instructor;
     Course course;
 
@@ -45,8 +48,8 @@ public class InstructorActivity extends AppCompatActivity {
         tvInstructorName = findViewById(R.id.tvInstructorName);
         tvSelectedCourse = findViewById(R.id.tvSelectedCourse);
         tvAssignedInstructor = findViewById(R.id.tvAssignedInstructor);
-        tvCapacity = findViewById(R.id.tvCapacity);
-        tvDescription = findViewById(R.id.tvDescription);
+        editCapacity = findViewById(R.id.editCapacity);
+        editDescription = findViewById(R.id.editDescription);
         instructorCoursesView = findViewById(R.id.instructorCoursesView);
 
         DatabaseHelper dbHelper = new DatabaseHelper(this);
@@ -69,10 +72,10 @@ public class InstructorActivity extends AppCompatActivity {
      */
     private void update(Course course) {
         this.course = course;
-        tvSelectedCourse.setText(course.getCode() + " — " + course.getName());
+        tvSelectedCourse.setText(String.format("%s — %s", course.getCode(), course.getName()));
 
-        tvCapacity.setText("" + course.getCapacity());
-        tvDescription.setText(course.getDescription());
+        editCapacity.setText(Integer.toString(course.getCapacity()));
+        editDescription.setText(course.getDescription());
 //        String desc = course.getDescription();
 //        Log.d("sysout", "got here");
 //        if (desc.equals("") || desc == null) tvDescription.setText("—");
@@ -216,28 +219,51 @@ public class InstructorActivity extends AppCompatActivity {
         if (course == null) {
             Utils.createErrorDialog(this, R.string.no_course);
             return;
+        } else if (course.getInstructor() == null || !course.getInstructor().equals(instructor)){
+            Utils.createErrorDialog(this, R.string.not_course_instructor);
+            return;
         }
+
         DatabaseHelper dbHelper = new DatabaseHelper(this);
 
         Log.d("sysout", "update cd called");
 
-        if (tvCapacity.getText().toString() != null && !tvCapacity.getText().toString().equals("") && !tvCapacity.getText().toString().equals("—")) {
-            int newCapacity = Integer.parseInt(tvCapacity.getText().toString()); // TODO trycatch this
+        if (!editCapacity.getText().toString().equals("") && !editCapacity.getText().toString().equals("—")) {
+            // Locked to number input, so long as setText does not add non-numeric characters.
+            int newCapacity = Integer.parseInt(editCapacity.getText().toString());
             if (newCapacity > 0) {
                 dbHelper.changeCourseCapacity(course.getCode(), newCapacity);
                 course.setCapacity(newCapacity);
             } else {
                 Utils.createErrorDialog(this, R.string.negative_capacity);
-                tvCapacity.setText(course.getCapacity());
+                editCapacity.setText(Integer.toString(course.getCapacity()));
             }
         } else {
             Utils.createErrorDialog(this, R.string.missing_fields);
         }
 
 
-        String newDescription = tvDescription.getText().toString();
+        String newDescription = editDescription.getText().toString();
         dbHelper.changeCourseDesc(course.getCode(), newDescription);
         course.setDescription(newDescription);
         update(course);
+    }
+
+    /**
+     * Method for the onClick of btn.
+     * @param view  The view that calls this method.
+     */
+    public void editCourseTimetable(View view){
+        if (course == null) {
+            Utils.createErrorDialog(this, R.string.no_course);
+            return;
+        } else if (course.getInstructor() == null || !course.getInstructor().equals(instructor)){
+            Utils.createErrorDialog(this, R.string.not_course_instructor);
+            return;
+        }
+
+        Intent intent = new Intent(this, TimetableActivity.class);
+        intent.putExtra(SELECTED_COURSE, course.getCode());
+        startActivity(intent);
     }
 }

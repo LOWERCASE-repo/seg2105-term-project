@@ -51,7 +51,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/courseTimeslotsView"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="500dp"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -61,23 +61,15 @@
         </androidx.recyclerview.widget.RecyclerView>
 
         <Button
-            android:id="@+id/btnAddTimeslotButton"
+            android:id="@+id/btnAddTimeslot"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:onClick="addTimeslot"
             android:text="@string/add_timeslot"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/courseTimeslotsView" />
-
-        <Button
-            android:id="@+id/btnBackToCoursesButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="150dp"
-            android:text="@string/back_to_courses"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btnAddTimeslotButton" />
+            app:layout_constraintTop_toBottomOf="@+id/courseTimeslotsView" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

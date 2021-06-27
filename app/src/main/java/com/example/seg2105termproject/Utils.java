@@ -38,12 +38,11 @@ public class Utils {
     /**
      * Converts an array of DayOfWeek (an enumeration of the days of the week) into
      * a formatted string.
+     * Ignores null cases in the array.
      * @param days  The array of the DayOfWeek enum.
      * @return  A string in the format of "-DAY,-DAY,...,-DAY,"
-     * @throws NullPointerException if a null reference is contained in the DayOfWeek
-     *                              array parameter.
      */
-    public static String daysToString(DayOfWeek[] days) throws NullPointerException{
+    public static String daysToString(DayOfWeek[] days) {
         if (days == null){
             return "";
         }
@@ -51,10 +50,12 @@ public class Utils {
         StringBuffer buffer = new StringBuffer();
 
         for (int i = 0; i < days.length; i++){
-            if (days[i] == null) throw new NullPointerException();
 
-            buffer.append(days[i].toString());
-            buffer.append(",");
+            // Ignore null cases.
+            if (days[i] != null){
+                buffer.append(days[i].toString());
+                buffer.append(",");
+            }
         }
 
         return buffer.toString();
@@ -63,13 +64,12 @@ public class Utils {
     /**
      * Converts an array of LocalTime objects (an object representing a time of the day)
      * into a formatted string.
+     * Ignores null cases in the array.
      * @param times The array of LocalTime objects.
      * @return  A string in the format of "HH:mm,HH:mm,...,HH:mm,"
      *          (in other words, in ISO_LOCAL_TIME format with commas after each entry).
-     * @throws NullPointerException if a null reference is contained in the LocalTime
-     *                              array parameter.
      */
-    public static String timesToString(LocalTime[] times) throws NullPointerException{
+    public static String timesToString(LocalTime[] times){
         if (times == null){
             return "";
         }
@@ -77,10 +77,12 @@ public class Utils {
         StringBuffer buffer = new StringBuffer();
 
         for (int i = 0; i < times.length; i++){
-            if (times[i] == null) throw new NullPointerException();
 
-            buffer.append(times[i].toString());
-            buffer.append(",");
+            // Ignore null cases.
+            if (times[i] != null){
+                buffer.append(times[i].toString());
+                buffer.append(",");
+            }
         }
 
         return buffer.toString();

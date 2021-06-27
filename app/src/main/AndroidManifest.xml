@@ -9,7 +9,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SEG2105TermProject">
-        <activity android:name=".InstructorActivity"></activity>
+        <activity android:name=".EditTimeslotActivity"/>
+        <activity android:name=".TimetableActivity"/>
+        <activity android:name=".InstructorActivity"/>
         <activity android:name=".StudentActivity" />
         <activity android:name=".AdminActivity" />
         <activity android:name=".MainActivity">

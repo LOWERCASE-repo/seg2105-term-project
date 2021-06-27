@@ -139,33 +139,47 @@ public class DatabaseTest {
     public void testChangeCourseTimes(){
         String name = "Test";
         String code = "TST 1010";
-        DayOfWeek[] days = {DayOfWeek.MONDAY, DayOfWeek.THURSDAY};
-        LocalTime[] starts = {LocalTime.of(8, 30), LocalTime.of(10, 0)};
-        LocalTime[] ends = {LocalTime.of(10, 0), LocalTime.of(11, 30)};
+        DayOfWeek[] days = {DayOfWeek.MONDAY, DayOfWeek.THURSDAY, DayOfWeek.WEDNESDAY};
+        LocalTime[] starts = {LocalTime.of(8, 30), LocalTime.of(10, 0), LocalTime.of(16, 20)};
+        LocalTime[] ends = {LocalTime.of(10, 0), LocalTime.of(11, 30), LocalTime.of(20, 35)};
 
-        dbHelper.addCourse(new Course(name, code));
-        dbHelper.changeCourseTimes(code, days, starts, ends);
+        DayOfWeek newDay = DayOfWeek.SATURDAY;
+        LocalTime newStart = LocalTime.of(14, 25);
+        LocalTime newEnd = LocalTime.of(19, 45);
 
-        assertEquals(dbHelper.getCourse(code),
-                new Course(
-                        name, code, null,
-                        days, starts, ends,
-                        null, 0
-                ));
+        dbHelper.addCourse(new Course(name, code, null, days, starts, ends, null, 0));
+
+        dbHelper.changeCourseTime(code, 1, newDay, newStart, newEnd);
+        assertEquals(dbHelper.getCourse(code), new Course(
+                name, code, null,
+                new DayOfWeek[]{days[0], newDay, days[2]},
+                new LocalTime[]{starts[0], newStart, starts[2]},
+                new LocalTime[]{ends[0], newEnd, ends[2]},
+                null, 0
+        ));
 
         try {
-            dbHelper.changeCourseTimes(code, days, starts, new LocalTime[0]);
+            dbHelper.changeCourseTime(code, 10, newDay, newStart, newEnd);
             fail();
-        } catch (IllegalArgumentException e){
+        } catch (ArrayIndexOutOfBoundsException e){
 
         }
 
         try {
-            dbHelper.changeCourseTimes(code, null, starts, ends);
+            dbHelper.changeCourseTime(code, 2, null, newStart, newEnd);
             fail();
         } catch (NullPointerException e){
 
         }
+
+        dbHelper.changeCourseTime(code, 0, days[1], starts[1], ends[1]);
+        assertEquals(dbHelper.getCourse(code), new Course(
+                name, code, null,
+                new DayOfWeek[]{days[1], newDay, days[2]},
+                new LocalTime[]{starts[1], newStart, starts[2]},
+                new LocalTime[]{ends[1], newEnd, ends[2]},
+                null, 0
+        ));
     }
 
     @Test
@@ -178,14 +192,14 @@ public class DatabaseTest {
 
         dbHelper.addCourse(new Course(name, code));
 
-        dbHelper.addCourseTimes(code, days[0], starts[0], ends[0]);
+        dbHelper.addCourseTime(code, days[0], starts[0], ends[0]);
         assertEquals(dbHelper.getCourse(code), new Course(
                 name, code, null,
                 new DayOfWeek[]{days[0]}, new LocalTime[]{starts[0]}, new LocalTime[]{ends[0]},
                 null, 0
         ));
 
-        dbHelper.addCourseTimes(code, days[1], starts[1], ends[1]);
+        dbHelper.addCourseTime(code, days[1], starts[1], ends[1]);
         assertEquals(dbHelper.getCourse(code), new Course(
                 name, code, null,
                 new DayOfWeek[]{days[0], days[1]},
@@ -205,7 +219,7 @@ public class DatabaseTest {
 
         dbHelper.addCourse(new Course(name, code, null, days, starts, ends, null, 0));
 
-        dbHelper.deleteCourseTime(code, days[1], starts[1], ends[1]);
+        dbHelper.deleteCourseTime(code, 1);
         assertEquals(dbHelper.getCourse(code), new Course(
                 name, code, null,
                 new DayOfWeek[]{days[0], days[2]},
@@ -215,13 +229,13 @@ public class DatabaseTest {
         ));
 
         try {
-            dbHelper.deleteCourseTime(code, days[1], starts[0], ends[1]);
+            dbHelper.deleteCourseTime(code, 10);
             fail();
         } catch (ArrayIndexOutOfBoundsException e){
 
         }
 
-        dbHelper.deleteCourseTime(code, days[0], starts[0], ends[0]);
+        dbHelper.deleteCourseTime(code, 0);
         assertEquals(dbHelper.getCourse(code), new Course(
                 name, code, null,
                 new DayOfWeek[]{days[2]},

@@ -11,7 +11,7 @@ public class UtilsTest {
 
     @Test
     public void testDaysToString(){
-        DayOfWeek[] days = {DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY};
+        DayOfWeek[] days = {DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, null, DayOfWeek.FRIDAY};
 
         String result = Utils.daysToString(days);
 
@@ -24,6 +24,7 @@ public class UtilsTest {
     public void testTimesToString(){
         LocalTime[] times = {LocalTime.of(8, 30),
                 LocalTime.of(10, 0),
+                null,
                 LocalTime.of(15, 45)};
 
         String result = Utils.timesToString(times);

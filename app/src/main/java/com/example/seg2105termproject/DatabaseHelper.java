@@ -356,35 +356,59 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Change the course times (weekdays, start and end times of said weekdays) of the specified
-     * Course to the passed times.
-     * The start and end times, kept in their respective array parameters, correspond to the days
-     * of the week, kept in the days array parameter.
-     * Together, they form a period of time of when the course is active.
+     * Change the specified course's time (weekday, start and end times of said weekday) at the
+     * specified position of the course's time arrays.
      * @param code          The code of the course which needs its times updated.
-     * @param days          The days of the week the course is active.
-     * @param startTimes    The time of the day when the course starts.
-     * @param endTimes      The time of the day when the course ends.
+     * @param position      The position in the array of the time that needs to be changed.
+     * @param day           The day of the week the course is active.
+     * @param startTime     The time of the day when the course starts.
+     * @param endTime       The time of the day when the course ends.
      * @throws IllegalArgumentException if course is not found or if parameter arrays are not
      *                                  the same length.
-     * @throws NullPointerException if any of the time arrays are null.
+     * @throws NullPointerException if any of the time parameters are null.
+     * @throws ArrayIndexOutOfBoundsException   if the position parameter is out of bounds.
      */
-    public void changeCourseTimes(String code, DayOfWeek[] days, LocalTime[] startTimes, LocalTime[] endTimes) throws IllegalArgumentException, NullPointerException{
+    public void changeCourseTime(String code, int position, DayOfWeek day, LocalTime startTime, LocalTime endTime) throws IllegalArgumentException, NullPointerException, ArrayIndexOutOfBoundsException{
         // If the arrays are not of the same length, throw exception.
-        if (days.length != startTimes.length || days.length != endTimes.length){
-            throw new IllegalArgumentException(Course.TIME_ARRAYS_LENGTH_NOT_EQ);
+        if (day == null || startTime == null || endTime == null){
+            throw new NullPointerException();
         }
 
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
 
+        // Create a cursor object, locating the selected course.
+        Cursor cursor = db.rawQuery(String.format("SELECT * FROM %s WHERE %s = \"%s\"",
+                CourseTable.TABLE_NAME, CourseTable.COLUMN_COURSE_CODE, code), null);
+
+        // If the course is not found, throw exception. Since this is done now,
+        // no exception has to be thrown later.
+        if (!cursor.moveToFirst()){
+            throw new IllegalArgumentException();
+        }
+
+        // Create arrays of the old time values.
+        DayOfWeek[] daysArray = Utils.parseDays(cursor.getString(4));
+        LocalTime[] startTimesArray = Utils.parseTimes(cursor.getString(5));
+        LocalTime[] endTimesArray = Utils.parseTimes(cursor.getString(6));
+
+        // If the position integer/index is out of bounds, toss exception.
+        // Note: catches array length == 0 since position will be >= 0 for that case.
+        if (position < 0 || position >= daysArray.length){
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        daysArray[position] = day;
+        startTimesArray[position] = startTime;
+        endTimesArray[position] = endTime;
+
         // Create the variable to hold the update info, then execute the update.
         ContentValues values = new ContentValues();
-        values.put(CourseTable.COLUMN_COURSE_DAYS, Utils.daysToString(days));
-        values.put(CourseTable.COLUMN_COURSE_START_TIMES, Utils.timesToString(startTimes));
-        values.put(CourseTable.COLUMN_COURSE_END_TIMES, Utils.timesToString(endTimes));
+        values.put(CourseTable.COLUMN_COURSE_DAYS, Utils.daysToString(daysArray));
+        values.put(CourseTable.COLUMN_COURSE_START_TIMES, Utils.timesToString(startTimesArray));
+        values.put(CourseTable.COLUMN_COURSE_END_TIMES, Utils.timesToString(endTimesArray));
 
-        int result = db.update(
+        db.update(
                 CourseTable.TABLE_NAME,
                 values,
                 CourseTable.COLUMN_COURSE_CODE + " = ?",
@@ -392,14 +416,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Close the database.
         db.close();
-
-        // If we didn't modify any rows, the course was not found. Throw the exception.
-        if (result == 0) throw new IllegalArgumentException();
     }
 
     /**
      * Adds a specified course time (being a combination of a day of the week, a start
-     * time, and an end time) from a course in the database.
+     * time, and an end time) to the end of a course's time arrays in the database.
      * @param code      The code of the course which needs a time added.
      * @param day       The day of the week of the course time to add.
      * @param startTime The start time of the course time to add.
@@ -407,7 +428,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @throws IllegalArgumentException if course is not found.
      * @throws NullPointerException if any of the course time parameters are null.
      */
-    public void addCourseTimes(String code, DayOfWeek day, LocalTime startTime, LocalTime endTime) throws IllegalArgumentException, NullPointerException{
+    public void addCourseTime (String code, DayOfWeek day, LocalTime startTime, LocalTime endTime) throws IllegalArgumentException, NullPointerException{
         // If any time parameters are null, throw NullPointerException.
         if (day == null || startTime == null || endTime == null){
             throw new NullPointerException();
@@ -426,10 +447,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             throw new IllegalArgumentException();
         }
 
-        // Create the new string, having the new time data attached to the back.
-        String newDays = cursor.getString(4) + day.toString() + ",";
-        String newStartTimes = cursor.getString(5) + startTime.toString() + ",";
-        String newEndTimes = cursor.getString(6) + endTime.toString() + ",";
+        String newDays = "";
+        String newStartTimes = "";
+        String newEndTimes = "";
+
+        // Create the new string, first checking if "null" was contained in the database.
+        // We cannot have "null" in the array string. Thus, replace it with a blank if it existed.
+        if (cursor.getString(4) != null){
+            newDays = cursor.getString(4);
+            newStartTimes = cursor.getString(5);
+            newEndTimes = cursor.getString(6);
+        }
+
+        // Attached the new time data to the back.
+        newDays = newDays + day.toString() + ",";
+        newStartTimes = newStartTimes + startTime.toString() + ",";
+        newEndTimes = newEndTimes + endTime.toString() + ",";
 
         // Add the values into the ContentValues container.
         ContentValues values = new ContentValues();
@@ -452,20 +485,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Deletes a specified course time (being a combination of a day of the week, a start
      * time, and an end time) from a course in the database.
      * @param code      The code of the course which needs a time deleted.
-     * @param day       The day of the week of the course time to delete.
-     * @param startTime The start time of the course time to delete.
-     * @param endTime   The end time of the course time to delete.
+     * @param position  The position in the array of the time that needs to be deleted.
      * @throws IllegalArgumentException if course is not found.
-     * @throws NullPointerException if any of the course time parameters are null.
-     * @throws ArrayIndexOutOfBoundsException   if the specified time is not registered
-     *                                          for the course.
+     * @throws ArrayIndexOutOfBoundsException   if the position parameter is out of bounds.
      */
-    public void deleteCourseTime (String code, DayOfWeek day, LocalTime startTime, LocalTime endTime) throws IllegalArgumentException, NullPointerException, ArrayIndexOutOfBoundsException{
-        // If any time parameters are null, throw NullPointerException.
-        if (day == null || startTime == null || endTime == null){
-            throw new NullPointerException();
-        }
-
+    public void deleteCourseTime (String code, int position) throws IllegalArgumentException, ArrayIndexOutOfBoundsException{
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -480,46 +504,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         // Create arrays of the old time values.
-        DayOfWeek[] oldDays = Utils.parseDays(cursor.getString(4));
-        LocalTime[] oldStartTimes = Utils.parseTimes(cursor.getString(5));
-        LocalTime[] oldEndTimes = Utils.parseTimes(cursor.getString(6));
+        DayOfWeek[] daysArray = Utils.parseDays(cursor.getString(4));
+        LocalTime[] startTimesArray = Utils.parseTimes(cursor.getString(5));
+        LocalTime[] endTimesArray = Utils.parseTimes(cursor.getString(6));
 
-        // If the array size is 0, then the next part won't work.
-        // As such, throw ArrayIndexOutOfBoundsException to symbolize that the
-        // specified time is not registered for the course.
-        if (oldDays.length == 0){
+        // If the position integer/index is out of bounds, toss exception.
+        // Note: catches array length == 0 since position will be >= 0 for that case.
+        if (position < 0 || position >= daysArray.length){
             throw new ArrayIndexOutOfBoundsException();
         }
 
-        // Instantiate new arrays for the new time values
-        // (one item shorter than the old arrays).
-        DayOfWeek[] newDays = new DayOfWeek[oldDays.length - 1];
-        LocalTime[] newStartTimes = new LocalTime[oldStartTimes.length - 1];
-        LocalTime[] newEndTimes = new LocalTime[oldEndTimes.length - 1];
-
-        // An index integer for the new array.
-        int index = 0;
-
-        // Loop through the old arrays.
-        // Will automatically result in ArrayIndexOutOfBoundsException due to unhandled
-        // incrementing as a result of not having one time set skipped.
-        for (int i = 0; i < oldDays.length; i++){
-
-            // For all values except the set described by the parameters,
-            // save them into the new arrays.
-            if (!oldDays[i].equals(day) || !oldStartTimes[i].equals(startTime) || !oldEndTimes[i].equals(endTime)){
-                newDays[index] = oldDays[i];
-                newStartTimes[index] = oldStartTimes[i];
-                newEndTimes[index] = oldEndTimes[i];
-                index++;
-            }
+        // Loop through the arrays.
+        // Shift all times after the target position back one position.
+        for (int i = position; i < daysArray.length - 1; i++){
+            daysArray[i] = daysArray[i+1];
+            startTimesArray[i] = startTimesArray[i+1];
+            endTimesArray[i] = endTimesArray[i+1];
         }
+
+        daysArray[daysArray.length - 1] = null;
+        startTimesArray[startTimesArray.length - 1] = null;
+        endTimesArray[endTimesArray.length - 1] = null;
 
         // Put the new time arrays into the ContentValues container.
         ContentValues values = new ContentValues();
-        values.put(CourseTable.COLUMN_COURSE_DAYS, Utils.daysToString(newDays));
-        values.put(CourseTable.COLUMN_COURSE_START_TIMES, Utils.timesToString(newStartTimes));
-        values.put(CourseTable.COLUMN_COURSE_END_TIMES, Utils.timesToString(newEndTimes));
+        values.put(CourseTable.COLUMN_COURSE_DAYS, Utils.daysToString(daysArray));
+        values.put(CourseTable.COLUMN_COURSE_START_TIMES, Utils.timesToString(startTimesArray));
+        values.put(CourseTable.COLUMN_COURSE_END_TIMES, Utils.timesToString(endTimesArray));
 
         // Update the database.
         db.update(CourseTable.TABLE_NAME,
