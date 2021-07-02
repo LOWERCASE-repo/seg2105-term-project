@@ -13,9 +13,19 @@ package com.example.seg2105termproject;
 */
 public class Instructor extends User{
 
-    public Instructor (int id, String username, String password) { super(id, username, password); }
+    public Instructor (int id, String username, String password) { super(id, username, password, null); }
     public Instructor (String username, String password){
         super(username, password);
+    }
+
+    @Override
+    public int[] getEnrolledCourses() {
+        return null;
+    }
+
+    @Override
+    public void setEnrolledCourses(int[] enrolledCourses) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("Instructors are not to be enrolled into courses.");
     }
 
     public UserType getType(){
@@ -27,6 +37,8 @@ public class Instructor extends User{
             return false;
         } else {
             Instructor other = (Instructor) obj;
+
+            // All instructors should have a non-null username.
             return (this.getUsername().equals(other.getUsername()));
         }
     }

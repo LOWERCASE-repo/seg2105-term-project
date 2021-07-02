@@ -37,6 +37,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         private static final String COLUMN_USER_TYPE = "User_Type";
         private static final String COLUMN_USERNAME = "Username";
         private static final String COLUMN_PASSWORD = "Password";
+        private static final String COLUMN_ENROLLED_COURSES = "Enrolled_Courses";
     }
 
     // CourseTable table for Course objects.
@@ -61,7 +62,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     Accounts._ID + " INTEGER PRIMARY KEY," +
                     Accounts.COLUMN_USER_TYPE + " TEXT," +
                     Accounts.COLUMN_USERNAME + " TEXT UNIQUE," +
-                    Accounts.COLUMN_PASSWORD + " TEXT)";
+                    Accounts.COLUMN_PASSWORD + " TEXT," +
+                    Accounts.COLUMN_ENROLLED_COURSES + " TEXT)";
 
     private static final String SQL_CREATE_COURSETABLE =
             "CREATE TABLE " + CourseTable.TABLE_NAME + " (" +
@@ -82,9 +84,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "DROP TABLE IF EXISTS " + CourseTable.TABLE_NAME;
 
     /**
-     * A string constant of null to add null string values to ContentValues objects.
+     * A string constant of an empty string, used as a blank for table values.
      */
-    private static final String EMPTY = null;
+    private static final String EMPTY = "";
 
     /**
      * The following are standard constants and methods for the OpenHelper.
@@ -126,6 +128,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(Accounts.COLUMN_USER_TYPE, user.getType().toString());
         values.put(Accounts.COLUMN_USERNAME, user.getUsername());
         values.put(Accounts.COLUMN_PASSWORD, user.getPassword());
+
+        if (user instanceof Student){
+            values.put(Accounts.COLUMN_ENROLLED_COURSES, Utils.intArrayToString(user.getEnrolledCourses()));
+        } else {
+            values.put(Accounts.COLUMN_ENROLLED_COURSES, EMPTY);
+        }
 
         // Insert the entry into the Accounts table of the database, throw an error if we
         // invalidate the unique constraint.
@@ -447,17 +455,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             throw new IllegalArgumentException();
         }
 
-        String newDays = "";
-        String newStartTimes = "";
-        String newEndTimes = "";
-
-        // Create the new string, first checking if "null" was contained in the database.
-        // We cannot have "null" in the array string. Thus, replace it with a blank if it existed.
-        if (cursor.getString(4) != null){
-            newDays = cursor.getString(4);
-            newStartTimes = cursor.getString(5);
-            newEndTimes = cursor.getString(6);
-        }
+        String newDays = cursor.getString(4);
+        String newStartTimes = cursor.getString(5);
+        String newEndTimes = cursor.getString(6);
 
         // Attached the new time data to the back.
         newDays = newDays + day.toString() + ",";
@@ -817,7 +817,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 user = new Student(
                         cursor.getInt(0),
                         cursor.getString(2),
-                        cursor.getString(3)
+                        cursor.getString(3),
+                        Utils.parseIntArray(cursor.getString(4))
                 );
                 break;
 

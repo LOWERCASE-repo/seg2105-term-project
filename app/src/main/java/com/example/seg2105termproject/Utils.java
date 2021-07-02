@@ -43,9 +43,7 @@ public class Utils {
      * @return  A string in the format of "-DAY,-DAY,...,-DAY,"
      */
     public static String daysToString(DayOfWeek[] days) {
-        if (days == null){
-            return "";
-        }
+        if (days == null) return "";
 
         StringBuffer buffer = new StringBuffer();
 
@@ -70,9 +68,7 @@ public class Utils {
      *          (in other words, in ISO_LOCAL_TIME format with commas after each entry).
      */
     public static String timesToString(LocalTime[] times){
-        if (times == null){
-            return "";
-        }
+        if (times == null) return "";
 
         StringBuffer buffer = new StringBuffer();
 
@@ -89,6 +85,24 @@ public class Utils {
     }
 
     /**
+     * Converts an array of integers, representing course IDs, into a formatted string.
+     * @param intArray  The array of course ID integers.
+     * @return  A string in the format of "%d,%d,...,%d,".
+     */
+    public static String intArrayToString(int[] intArray){
+        if (intArray == null) return "";
+
+        StringBuffer buffer = new StringBuffer();
+
+        for (int i = 0; i < intArray.length; i++){
+            buffer.append(intArray[i]);
+            buffer.append(",");
+        }
+
+        return buffer.toString();
+    }
+
+    /**
      * Parses a string, formatted from Utils.daysToString, and returns the equivalent
      * array of DayOfWeek enums.
      * @param strDays   The string formatted as "-DAY,-DAY,...,-DAY,".
@@ -96,9 +110,7 @@ public class Utils {
      *          listed in the string.
      */
     public static DayOfWeek[] parseDays(String strDays){
-        if (strDays == null){
-            return new DayOfWeek[0];
-        }
+        if (strDays == null) return new DayOfWeek[0];
 
         int pointer = 0;
         ArrayList<DayOfWeek> days = new ArrayList<DayOfWeek>();
@@ -121,9 +133,7 @@ public class Utils {
      *          listed in the string.
      */
     public static LocalTime[] parseTimes(String strTimes){
-        if (strTimes == null){
-            return new LocalTime[0];
-        }
+        if (strTimes == null) return new LocalTime[0];
 
         int pointer = 0;
         ArrayList<LocalTime> times = new ArrayList<LocalTime>();
@@ -136,5 +146,36 @@ public class Utils {
         }
 
         return times.toArray(new LocalTime[]{});
+    }
+
+    /**
+     * Parses a string, fromatted from Utils.coursesToString, and returns the equivalent
+     * array of integers.
+     * @param strIntegers   The string formatted as "%d,%d,...,%d,".
+     * @return  The course ID integer array that is equivalent to the integers listed in
+     *          the string.
+     */
+    public static int[] parseIntArray(String strIntegers){
+        if (strIntegers == null) return new int[0];
+
+        int pointer = 0;
+        ArrayList<Integer> courses = new ArrayList<Integer>();
+
+        for (int i = 0; i < strIntegers.length(); i++){
+            if (strIntegers.charAt(i) == ','){
+                courses.add(Integer.parseInt(strIntegers.substring(pointer, i)));
+                pointer = i + 1;
+            }
+        }
+
+        // Extra steps in having to translate the wrapper class array to a primitive type array.
+        Integer[] wrapper = courses.toArray(new Integer[]{});
+        int[] prim = new int[wrapper.length];
+
+        for (int j = 0; j < wrapper.length; j++){
+            prim[j] = wrapper[j];
+        }
+
+        return prim;
     }
 }

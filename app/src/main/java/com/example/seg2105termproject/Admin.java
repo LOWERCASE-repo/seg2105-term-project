@@ -13,9 +13,19 @@ package com.example.seg2105termproject;
 */
 public class Admin extends User{
 
-    public Admin (int id, String username, String password) { super(id, username, password); }
+    public Admin (int id, String username, String password) { super(id, username, password, null); }
     public Admin (String username, String password){
         super(username, password);
+    }
+
+    @Override
+    public int[] getEnrolledCourses() {
+        return null;
+    }
+
+    @Override
+    public void setEnrolledCourses(int[] enrolledCourses) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("Instructors are not to be enrolled into courses.");
     }
 
     public UserType getType(){

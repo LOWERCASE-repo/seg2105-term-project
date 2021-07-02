@@ -1,4 +1,7 @@
 package com.example.seg2105termproject;
+
+import java.util.Arrays;
+
 /**
  * This file is part of Course Booking application for Android devices
  *
@@ -16,11 +19,13 @@ public abstract class User {
     private int id;
     private String username;
     private String password;
+    protected int[] enrolledCourses;
 
-    public User(int id, String username, String password){
+    public User(int id, String username, String password, int[] enrolledCourses){
         this.id = id;
         this.username = username;
         this.password = password;
+        this.enrolledCourses = enrolledCourses;
     }
 
     public User(String username, String password){
@@ -36,6 +41,8 @@ public abstract class User {
         return password;
     }
 
+    public abstract int[] getEnrolledCourses();
+
     public void setUsername(String username) {
         this.username = username;
     }
@@ -43,6 +50,8 @@ public abstract class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public abstract void setEnrolledCourses(int[] enrolledCourses);
 
     public abstract UserType getType();
 
@@ -52,10 +61,27 @@ public abstract class User {
         }
 
         User user = (User) other;
-
-        return this.id == user.id &&
-                this.username.equals(user.username) &&
-                this.password.equals(user.password) &&
+        boolean b = this.id == user.id &&
                 this.getType().equals(user.getType());
+
+        if (this.password == null){
+            b = b && user.username == null;
+        } else {
+            b = b && this.username.equals(user.username);
+        }
+
+        if (this.password == null){
+            b = b && user.password == null;
+        } else {
+            b = b && this.password.equals(user.password);
+        }
+
+        if (this.enrolledCourses == null){
+            b = b && user.enrolledCourses == null;
+        } else {
+            b = b && Arrays.equals(this.enrolledCourses, user.enrolledCourses);
+        }
+
+        return b;
     }
 }
