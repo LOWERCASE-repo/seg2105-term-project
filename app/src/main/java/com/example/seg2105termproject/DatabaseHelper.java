@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import android.util.Log;
 
+import java.lang.reflect.Array;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
@@ -129,7 +130,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(Accounts.COLUMN_USERNAME, user.getUsername());
         values.put(Accounts.COLUMN_PASSWORD, user.getPassword());
 
-        if (user instanceof Student){
+        if (user.getType() == UserType.STUDENT){
             values.put(Accounts.COLUMN_ENROLLED_COURSES, Utils.intArrayToString(user.getEnrolledCourses()));
         } else {
             values.put(Accounts.COLUMN_ENROLLED_COURSES, EMPTY);
@@ -138,7 +139,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Insert the entry into the Accounts table of the database, throw an error if we
         // invalidate the unique constraint.
         if (db.insert(Accounts.TABLE_NAME, null, values) == -1) {
-            throw new IllegalArgumentException();
+            throwExceptionAndClose(db, null, new IllegalArgumentException());
         }
 
         // Close the reference.
@@ -242,18 +243,205 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
 
+        // Create the selection and corresponding selectionArgs string(s).
+        String selection = CourseTable.COLUMN_COURSE_CODE + " LIKE ?";
         String[] selectionArgs = {courseCode};
 
-        int result = db.delete(
+        // Query the database. Get the cursor object pointing to the course.
+        Cursor cursor = db.query(
                 CourseTable.TABLE_NAME,
-                CourseTable.COLUMN_COURSE_CODE + " LIKE ?",
+                new String[]{CourseTable._ID},
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+        );
+
+        // If the course was not found, throw exception.
+        if (!cursor.moveToFirst()) throwExceptionAndClose(db, cursor, new IllegalArgumentException());
+
+        // Get the id of the course.
+        int id = Integer.parseInt(cursor.getString(0));
+
+        // Create the selection string for the query.
+        String idSelection = Accounts.COLUMN_ENROLLED_COURSES + " LIKE ? OR " +
+                Accounts.COLUMN_ENROLLED_COURSES + " LIKE ?";
+
+        // Create patterns for SQL LIKE operator.
+        String[] idPatterns = {
+                "%," + id + ",%",
+                id + ",%"
+        };
+
+        // Find all students enrolled in the course.
+        Cursor userCursor = db.query(
+                Accounts.TABLE_NAME,
+                new String[]{Accounts.COLUMN_USERNAME},
+                idSelection,
+                idPatterns,
+                null,
+                null,
+                null
+        );
+
+        // For each student enrolled in the course, unenroll them.
+        if (userCursor.moveToFirst()){
+            do {
+                removeEnrolledCourse(userCursor.getString(0), id);
+            } while (userCursor.moveToNext());
+
+            // Since #removeEnrolledCourse(String, int) will close the database reference
+            // (seems to be one reference overall), reopen the reference afterwards.
+            db = this.getWritableDatabase();
+        }
+
+        // Delete the course.
+        db.delete(
+                CourseTable.TABLE_NAME,
+                selection,
                 selectionArgs);
 
         // Regardless of success or not, close the database.
         db.close();
+        cursor.close();
+        userCursor.close();
+    }
 
-        // If we didn't modify any rows, the course was not found. Throw the exception.
-        if (result == 0) throw new IllegalArgumentException();
+    /**
+     * Adds a course to a Student's enrolled courses attribute.
+     * @param username  The username of the student, enrolling to a course.
+     * @param targetId  The id of the course the student is enrolling to.
+     * @throws IllegalArgumentException if the student was not found, or the username does not
+     *                                  belong to a student.
+     */
+    public void addEnrolledCourse(String username, int targetId) throws IllegalArgumentException {
+
+        // Get reference to writable database.
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Create cursor object with query.
+        Cursor cursor = db.query(
+                Accounts.TABLE_NAME,
+                new String[]{Accounts.COLUMN_USER_TYPE, Accounts.COLUMN_ENROLLED_COURSES},
+                Accounts.COLUMN_USERNAME + " = ?",
+                new String[]{username},
+                null,
+                null,
+                null);
+
+        // If course not found, throw exception.
+        if (!cursor.moveToFirst()) {
+            throwExceptionAndClose(db, cursor, new IllegalArgumentException());
+        }
+
+        // Check if the UserType of the passed user(name) is of STUDENT.
+        UserType type = UserType.valueOf(cursor.getString(0));
+        if (type != UserType.STUDENT) {
+            throwExceptionAndClose(db, cursor, new IllegalArgumentException("Passed user is not a Student"));
+        }
+
+        // Since only the user type and enrolled courses column were queried,
+        // the column index of enrolled courses is 1.
+        String newCourseIds = cursor.getString(1) + targetId + ",";
+
+        // Create content values container. Insert the new courseIds string.
+        ContentValues values = new ContentValues();
+        values.put(Accounts.COLUMN_ENROLLED_COURSES, newCourseIds);
+
+        // Update the database.
+        db.update(
+                Accounts.TABLE_NAME,
+                values,
+                Accounts.COLUMN_USERNAME + " = ?",
+                new String[]{username});
+
+        // Close the database and cursor.
+        db.close();
+        cursor.close();
+    }
+
+    /**
+     * Deletes a course from a Student's enrolled courses attribute.
+     * @param username  The username of the student, unenrolling from a course.
+     * @param targetId  The id of the course the student is unenrolling from.
+     * @throws IllegalArgumentException if the student was not found, the username does not belong
+     *                                  to a student, or the student was not enrolled to the passed
+     *                                  course.
+     * @throws IllegalStateException    if the student is not enrolled in any courses.
+     */
+    public void removeEnrolledCourse (String username, int targetId) throws IllegalArgumentException, IllegalStateException {
+
+        // Get reference to writable database.
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Create cursor object with query.
+        Cursor cursor = db.query(
+                Accounts.TABLE_NAME,
+                new String[]{Accounts.COLUMN_USER_TYPE, Accounts.COLUMN_ENROLLED_COURSES},
+                Accounts.COLUMN_USERNAME + " = ?",
+                new String[]{username},
+                null,
+                null,
+                null);
+
+        // If course not found, throw exception.
+        if (!cursor.moveToFirst()) {
+            throwExceptionAndClose(db, cursor, new IllegalArgumentException());
+        }
+
+        // Check if the UserType of the passed user(name) is of STUDENT.
+        UserType type = UserType.valueOf(cursor.getString(0));
+        if (type != UserType.STUDENT) {
+            throwExceptionAndClose(db, cursor, new IllegalArgumentException("Passed user is not a Student"));
+        }
+
+        // Get the integer array of course ids.
+        int[] courseIds = Utils.parseIntArray(cursor.getString(1));
+
+        // If the Student has not enrolled into any course, then it is impossible to unenroll.
+        // Therefore, throw exception.
+        if (courseIds.length < 1) {
+            throwExceptionAndClose(db, cursor, new IllegalArgumentException());
+        }
+
+        // Instance new array, of one size smaller.
+        int[] newCourseIds = new int[courseIds.length - 1];
+        int index = 0;
+
+        // For each course id,
+        for (int courseId : courseIds){
+
+            // Save it to the new array, if it's not the id of the passed course.
+            if (courseId != targetId){
+
+                // Should an ArrayIndexOutOfBoundsException be thrown (from int index incrementing
+                // too far), it means that the Student was not enrolled in the passed course.
+                try {
+                    newCourseIds[index] = courseId;
+                } catch (ArrayIndexOutOfBoundsException e){
+                    throwExceptionAndClose(db, cursor, new IllegalArgumentException("Student was not enrolled in passed course"));
+                }
+
+                index++;
+            }
+        }
+
+        // Create content values container. Insert the new courseIds string.
+        ContentValues values = new ContentValues();
+        values.put(Accounts.COLUMN_ENROLLED_COURSES, Utils.intArrayToString(newCourseIds));
+
+        // Update the database.
+        db.update(
+                Accounts.TABLE_NAME,
+                values,
+                Accounts.COLUMN_USERNAME + " = ?",
+                new String[]{username}
+        );
+
+        // Close the database.
+        db.close();
+        cursor.close();
     }
 
     /**
@@ -272,7 +460,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Make sure the check was successful
         if (cursor.getCount() != 0) {
-            throw new IllegalArgumentException(String.valueOf(R.string.course_already_exists));
+            throwExceptionAndClose(db, cursor, new IllegalArgumentException(String.valueOf(R.string.course_already_exists)));
         }
 
         // Close the cursor.
@@ -392,7 +580,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // If the course is not found, throw exception. Since this is done now,
         // no exception has to be thrown later.
         if (!cursor.moveToFirst()){
-            throw new IllegalArgumentException();
+            throwExceptionAndClose(db, cursor, new IllegalArgumentException());
         }
 
         // Create arrays of the old time values.
@@ -403,7 +591,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // If the position integer/index is out of bounds, toss exception.
         // Note: catches array length == 0 since position will be >= 0 for that case.
         if (position < 0 || position >= daysArray.length){
-            throw new ArrayIndexOutOfBoundsException();
+            throwExceptionAndClose(db, cursor, new ArrayIndexOutOfBoundsException());
         }
 
         daysArray[position] = day;
@@ -422,8 +610,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 CourseTable.COLUMN_COURSE_CODE + " = ?",
                 new String[]{code});
 
-        // Close the database.
+        // Close the database and cursor.
         db.close();
+        cursor.close();
     }
 
     /**
@@ -452,17 +641,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // If the course is not found, throw exception. Since this is done now,
         // no exception has to be thrown later.
         if (!cursor.moveToFirst()){
-            throw new IllegalArgumentException();
+            throwExceptionAndClose(db, cursor, new IllegalArgumentException());
         }
 
-        String newDays = cursor.getString(4);
-        String newStartTimes = cursor.getString(5);
-        String newEndTimes = cursor.getString(6);
-
-        // Attached the new time data to the back.
-        newDays = newDays + day.toString() + ",";
-        newStartTimes = newStartTimes + startTime.toString() + ",";
-        newEndTimes = newEndTimes + endTime.toString() + ",";
+        // Concatenate the string representations with the existing string of time slots.
+        String newDays = cursor.getString(4) + day.toString() + ",";
+        String newStartTimes = cursor.getString(5) + startTime.toString() + ",";
+        String newEndTimes = cursor.getString(6) + endTime.toString() + ",";
 
         // Add the values into the ContentValues container.
         ContentValues values = new ContentValues();
@@ -477,8 +662,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 CourseTable.COLUMN_COURSE_CODE + " = ?",
                 new String[]{code});
 
-        // Close the database.
+        // Close the database and cursor.
         db.close();
+        cursor.close();
     }
 
     /**
@@ -500,7 +686,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // If the course is not found, throw exception. Since this is done now,
         // no exception has to be thrown later.
         if (!cursor.moveToFirst()){
-            throw new IllegalArgumentException();
+            throwExceptionAndClose(db, cursor, new IllegalArgumentException());
         }
 
         // Create arrays of the old time values.
@@ -511,7 +697,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // If the position integer/index is out of bounds, toss exception.
         // Note: catches array length == 0 since position will be >= 0 for that case.
         if (position < 0 || position >= daysArray.length){
-            throw new ArrayIndexOutOfBoundsException();
+            throwExceptionAndClose(db, cursor, new ArrayIndexOutOfBoundsException());
         }
 
         // Loop through the arrays.
@@ -538,8 +724,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 CourseTable.COLUMN_COURSE_CODE + " = ?",
                 new String[]{code});
 
-        // Close the database.
+        // Close the database and cursor.
         db.close();
+        cursor.close();
     }
 
     /**
@@ -616,7 +803,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, null);
 
         // Declare the User variable.
-        User user;
+        User user = null;
 
         // If the User was found,
         if (cursor.moveToFirst()){
@@ -626,7 +813,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         } else {
             // If the object is not found, throw exception.
-            throw new IllegalArgumentException();
+            throwExceptionAndClose(db, cursor, new IllegalArgumentException());
         }
 
         // Close the cursor and database objects.
@@ -657,7 +844,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, null);
 
         // Declare Course variable.
-        Course course;
+        Course course = null;
 
         // If the Course was found,
         if (cursor.moveToFirst()){
@@ -667,7 +854,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         } else {
             // If the course was not found, throw exception.
-            throw new IllegalArgumentException();
+            throwExceptionAndClose(db, cursor, new IllegalArgumentException());
         }
 
         // Close the cursor and database objects.
@@ -700,7 +887,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, null);
 
         // Declare Course variable.
-        Course course;
+        Course course = null;
 
         // If the Course was found,
         if (cursor.moveToFirst()){
@@ -710,7 +897,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         } else {
             // If the course was not found, throw exception.
-            throw new IllegalArgumentException();
+            throwExceptionAndClose(db, cursor, new IllegalArgumentException());
         }
 
         // Close the cursor and database objects.
@@ -780,6 +967,95 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Returns an array of courses the passed Student is enrolled to.
+     * @param username  The username of the Student.
+     * @return  The array of courses the passed Student is enrolled to.
+     * @throws IllegalArgumentException if the student was not found, or the username does not
+     *                                  belong to a student.
+     */
+    public Course[] getEnrolledCourses(String username) throws IllegalArgumentException{
+        // Get reference to writable database (is writable for cleaning course ids).
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Create cursor object with query.
+        Cursor cursor = db.query(
+                Accounts.TABLE_NAME,
+                new String[]{Accounts.COLUMN_USER_TYPE, Accounts.COLUMN_ENROLLED_COURSES},
+                Accounts.COLUMN_USERNAME + " = ?",
+                new String[]{username},
+                null,
+                null,
+                null);
+
+        // If course not found, throw exception.
+        if (!cursor.moveToFirst()) throwExceptionAndClose(db, cursor, new IllegalArgumentException());
+
+        // Check if the UserType of the passed user(name) is of STUDENT.
+        UserType type = UserType.valueOf(cursor.getString(0));
+        if (type != UserType.STUDENT) throwExceptionAndClose(db, cursor, new IllegalArgumentException("Passed user is not a Student"));
+
+        // In order to use .query(...), the course ids need to be translated to Strings.
+        // Construct the integer and String arrays.
+        int[] courseIds = Utils.parseIntArray(cursor.getString(1));
+        String[] strCourseIds = new String[courseIds.length];
+
+        // In the meantime, the SQL WHERE clauses need to be constructed as well, with one
+        // ? per course id.
+        StringBuilder whereStatement = new StringBuilder();
+        whereStatement.append(CourseTable._ID);
+        whereStatement.append(" IN (");
+
+        // For each course id,
+        for (int i = 0; i < courseIds.length; i++){
+            // Convert to String.
+            strCourseIds[i] = Integer.toString(courseIds[i]);
+
+            // Append a ? to the WHERE clause.
+            whereStatement.append("?");
+
+            // Do not add a comma for the last course id.
+            if (i != courseIds.length - 1) whereStatement.append(",");
+        }
+
+        // Finish off the bracket.
+        whereStatement.append(")");
+
+        Cursor courseCursor = db.query(
+                CourseTable.TABLE_NAME,
+                null,               // Will pass all columns.
+                whereStatement.toString(),
+                strCourseIds,
+                null,
+                null,
+                CourseTable._ID + " ASC"
+        );
+
+        Course[] enrolledCourses;
+
+        // If courses of the ids were found in the database,
+        if (courseCursor.moveToFirst()){
+            int i = 0;
+            enrolledCourses = new Course[courseCursor.getCount()];
+
+            // Add all courses to array.
+            do {
+                enrolledCourses[i++] = constructCourse(courseCursor);
+            } while (courseCursor.moveToNext());
+
+        } else {
+            enrolledCourses = new Course[0];
+        }
+
+        // Close the database and cursors.
+        db.close();
+        cursor.close();
+        courseCursor.close();
+
+        // Return the array of enrolled courses.
+        return enrolledCourses;
+    }
+
+    /**
      * Constructs and returns the reference to the User subclass object the passed cursor
      * object is pointing at.
      * @param cursor    The cursor object that currently points at the desired user in the
@@ -789,7 +1065,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private User constructUserSubclass(Cursor cursor){
 
         // Declare the user variable.
-        User user;
+        User user = null;
 
         // Get the type of User saved in the database.
         UserType type = UserType.valueOf(cursor.getString(1));
@@ -827,7 +1103,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 // therefore meaning an error has occurred if this runs.
 
                 // Any better exception suggestions?
-                throw new IllegalStateException("Stored User has does not have valid typing");
+                throwExceptionAndClose(null, cursor, new IllegalStateException("Stored User has does not have valid typing"));
         }
 
         // Return the instantiated user subclass.
@@ -838,7 +1114,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Constructs and returns the reference to the Course object the passed cursor
      * object is pointing at.
      * @param cursor    The cursor object that currently points at the desired course in the
-     *                  database.
+     *                  database. Must have all columns of the database.
      * @return  The reference to the Course object that the cursor is pointing at.
      */
     public Course constructCourse(Cursor cursor){
@@ -867,5 +1143,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cursor.getString(7),
                 Integer.parseInt(cursor.getString(8))
         );
+    }
+
+    /**
+     * Throws the passed exception and closes the passed database and cursor.
+     * @param db        The reference of the database that needs to be closed.
+     * @param cursor    The reference of the cursor that needs to be closed.
+     * @param exception The exception that needs to be thrown.
+     */
+    private void throwExceptionAndClose(SQLiteDatabase db, Cursor cursor, RuntimeException exception){
+        if (db != null) db.close();
+        if (cursor != null) cursor.close();
+        throw exception;
     }
 }
