@@ -1,5 +1,7 @@
 package com.example.seg2105termproject;
 
+import android.util.Log;
+
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
@@ -49,6 +51,98 @@ public class DatabaseTest {
         dbHelper = new DatabaseHelper(InstrumentationRegistry.getInstrumentation().getTargetContext());
     }
 
+    // All User-related database methods are below.
+    @Test
+    public void testAddUser(){
+        String name1 = "admin";
+        String name2 = "Tony";
+        String name3 = "Subaru";
+
+        Admin admin = new Admin(1, name1, "admin123");
+        Instructor tony = new Instructor(2, name2, "regexFile");
+        Student subaru = new Student(3, name3, "quack", new int[0]);
+
+        dbHelper.addUser(admin);
+        dbHelper.addUser(tony);
+        dbHelper.addUser(subaru);
+
+        User u1 = dbHelper.getUser(name1);
+        User u2 = dbHelper.getUser(name2);
+        User u3 = dbHelper.getUser(name3);
+
+        assertEquals(admin, u1);
+        assertEquals(tony, u2);
+        assertEquals(subaru, u3);
+    }
+
+    @Test
+    public void testDeleteUser(){
+        // TODO: Create test.
+    }
+
+    @Test
+    public void testGetEnrolledCourses(){
+        String name = "Jimmy";
+        String password = "1234";
+        int[] courseIds = {1,2,3,4};
+        Course[] courses = {
+                new Course(1, "N1", "C1"),
+                new Course(2, "N2", "C2"),
+                new Course(3, "N3", "C3"),
+                new Course(4, "N4", "C4")
+        };
+
+        for (Course course : courses){
+            dbHelper.addCourse(course);
+        }
+
+        Student jimmy = new Student(0, name, password, courseIds);
+        dbHelper.addUser(jimmy);
+
+        // Check getEnrolledCourse
+        Course[] result = dbHelper.getEnrolledCourses(name);
+
+        assertArrayEquals(courses, result);
+    }
+
+    @Test
+    public void testEditEnrolledCourses(){
+        String name = "Jimmy";
+        String password = "1234";
+        int[] courseIds = {1,3,4,5};
+        Course[] courses = {
+                new Course(1, "Math", "MAT 1341"),
+                new Course(2, "English", "ENG 1001"),
+                new Course(3, "Intro to Python", "ITI 1120"),
+                new Course(4, "Digital Systems", "ITI 1100"),
+                new Course(5, "Physics", "PHY 1321")
+        };
+
+        for (Course course : courses){
+            dbHelper.addCourse(course);
+        }
+
+        Student jimmy = new Student(0, name, password, courseIds);
+
+        dbHelper.addUser(jimmy);
+
+        // Try addEnrolledCourse
+        dbHelper.addEnrolledCourse(name, courses[1].getId());
+        Course[] result1 = dbHelper.getEnrolledCourses(name);
+        Course[] expected1 = {courses[0], courses[1], courses[2], courses[3], courses[4]};
+
+        assertArrayEquals(expected1, result1);
+
+        // Try removeEnrolledCourse
+        dbHelper.removeEnrolledCourse(name, courses[3].getId());
+        Course[] result2 = dbHelper.getEnrolledCourses(name);
+        Course[] expected2 = {courses[0], courses[1], courses[2], courses[4]};
+
+        assertArrayEquals(expected2, result2);
+    }
+
+
+    // All Course-related database methods are below.
     @Test
     public void testAddCourse(){
         String code = "ENG 1010";
@@ -63,21 +157,42 @@ public class DatabaseTest {
                 0);
         dbHelper.addCourse(c1);
         Course c2 = dbHelper.getCourse(code);
-        assertEquals(c2, c1);
+        assertEquals(c1, c2);
     }
 
     @Test
     public void testDeleteCourse(){
-        String code = "SEG 2105";
-        Course test = new Course("Software Engineering", code);
-        dbHelper.addCourse(test);
-        dbHelper.deleteCourse(code);
+        String code1 = "SEG 2105";
+        String code2 = "BIO 8008";
+        Course test1 = new Course(1,"Software Engineering", code1);
+        Course test2 = new Course(2, "Biology", code2);
+        Student[] students = {
+                new Student(1, "Billy", "fart", new int[]{1,3,5,7}),
+                new Student(2, "Andrew", "bananas", new int[]{30,26,52,1,40}),
+                new Student(3, "Enigma", "edgykid", new int[]{3,101})
+        };
+
+        for (Student student : students){
+            dbHelper.addUser(student);
+        }
+
+        dbHelper.addCourse(test1);
+        dbHelper.addCourse(test2);
+        dbHelper.deleteCourse(code1);   // Delete course with enrolled students.
+        dbHelper.deleteCourse(code2);   // Delete course without enrolled students.
+
         try {
-            dbHelper.getCourse(code);
+            dbHelper.getCourse(code1);
             fail();
         } catch (IllegalArgumentException e){
 
         }
+
+        // Ensure the course id is removed from the enrolled students.
+        User[] users = dbHelper.getAllUsers();
+        assertArrayEquals(new int[]{3,5,7}, users[0].getEnrolledCourses());
+        assertArrayEquals(new int[]{30,26,52,40}, users[1].getEnrolledCourses());
+        assertArrayEquals(new int[]{3,101}, users[2].getEnrolledCourses());
     }
 
     @Test
@@ -88,7 +203,7 @@ public class DatabaseTest {
 
         dbHelper.addCourse(new Course(name, code));
         dbHelper.changeCourseCode(code, newCode);
-        assertEquals(dbHelper.getCourse(newCode), new Course(name, newCode));
+        assertEquals(new Course(name, newCode), dbHelper.getCourse(newCode));
 
         dbHelper.addCourse(new Course("English", "ENG 1010"));
         try {
@@ -107,7 +222,7 @@ public class DatabaseTest {
 
         dbHelper.addCourse(new Course(name, code));
         dbHelper.changeCourseName(code, newName);
-        assertEquals(dbHelper.getCourse(code), new Course(newName, code));
+        assertEquals(new Course(newName, code), dbHelper.getCourse(code));
     }
 
     @Test
@@ -126,13 +241,13 @@ public class DatabaseTest {
 
         dbHelper.addCourse(test);
         dbHelper.changeCourseInstructor(code, null);
-        assertEquals(dbHelper.getCourse(code), new Course(name, code));
+        assertEquals(new Course(name, code, null, new DayOfWeek[0], new LocalTime[0], new LocalTime[0], "", 0), dbHelper.getCourse(code));
 
         Instructor i = new Instructor("John", "fatty");
         dbHelper.addUser(i);
 
         dbHelper.changeCourseInstructor(code, i);
-        assertEquals(dbHelper.getCourse(code), new Course(1, name, code, i));
+        assertEquals(new Course(name, code, i, new DayOfWeek[0], new LocalTime[0], new LocalTime[0], "", 0), dbHelper.getCourse(code));
     }
 
     @Test
@@ -150,13 +265,13 @@ public class DatabaseTest {
         dbHelper.addCourse(new Course(name, code, null, days, starts, ends, null, 0));
 
         dbHelper.changeCourseTime(code, 1, newDay, newStart, newEnd);
-        assertEquals(dbHelper.getCourse(code), new Course(
+        assertEquals(new Course(
                 name, code, null,
                 new DayOfWeek[]{days[0], newDay, days[2]},
                 new LocalTime[]{starts[0], newStart, starts[2]},
                 new LocalTime[]{ends[0], newEnd, ends[2]},
                 null, 0
-        ));
+        ), dbHelper.getCourse(code));
 
         try {
             dbHelper.changeCourseTime(code, 10, newDay, newStart, newEnd);
@@ -173,13 +288,13 @@ public class DatabaseTest {
         }
 
         dbHelper.changeCourseTime(code, 0, days[1], starts[1], ends[1]);
-        assertEquals(dbHelper.getCourse(code), new Course(
+        assertEquals(new Course(
                 name, code, null,
                 new DayOfWeek[]{days[1], newDay, days[2]},
                 new LocalTime[]{starts[1], newStart, starts[2]},
                 new LocalTime[]{ends[1], newEnd, ends[2]},
                 null, 0
-        ));
+        ), dbHelper.getCourse(code));
     }
 
     @Test
@@ -193,20 +308,20 @@ public class DatabaseTest {
         dbHelper.addCourse(new Course(name, code));
 
         dbHelper.addCourseTime(code, days[0], starts[0], ends[0]);
-        assertEquals(dbHelper.getCourse(code), new Course(
+        assertEquals(new Course(
                 name, code, null,
                 new DayOfWeek[]{days[0]}, new LocalTime[]{starts[0]}, new LocalTime[]{ends[0]},
                 null, 0
-        ));
+        ), dbHelper.getCourse(code));
 
         dbHelper.addCourseTime(code, days[1], starts[1], ends[1]);
-        assertEquals(dbHelper.getCourse(code), new Course(
+        assertEquals(new Course(
                 name, code, null,
                 new DayOfWeek[]{days[0], days[1]},
                 new LocalTime[]{starts[0], starts[1]},
                 new LocalTime[]{ends[0], ends[1]},
                 null, 0
-        ));
+        ), dbHelper.getCourse(code));
     }
 
     @Test
@@ -220,13 +335,13 @@ public class DatabaseTest {
         dbHelper.addCourse(new Course(name, code, null, days, starts, ends, null, 0));
 
         dbHelper.deleteCourseTime(code, 1);
-        assertEquals(dbHelper.getCourse(code), new Course(
+        assertEquals(new Course(
                 name, code, null,
                 new DayOfWeek[]{days[0], days[2]},
                 new LocalTime[]{starts[0], starts[2]},
                 new LocalTime[]{ends[0], ends[2]},
                 null, 0
-        ));
+        ), dbHelper.getCourse(code));
 
         try {
             dbHelper.deleteCourseTime(code, 10);
@@ -236,13 +351,13 @@ public class DatabaseTest {
         }
 
         dbHelper.deleteCourseTime(code, 0);
-        assertEquals(dbHelper.getCourse(code), new Course(
+        assertEquals(new Course(
                 name, code, null,
                 new DayOfWeek[]{days[2]},
                 new LocalTime[]{starts[2]},
                 new LocalTime[]{ends[2]},
                 null, 0
-        ));
+        ), dbHelper.getCourse(code));
     }
 
     @Test
@@ -254,12 +369,11 @@ public class DatabaseTest {
         dbHelper.addCourse(new Course(name, code));
         dbHelper.changeCourseDesc(code, desc);
 
-        assertEquals(dbHelper.getCourse(code),
-                new Course(
+        assertEquals(new Course(
                         name, code, null,
                         new DayOfWeek[0], new LocalTime[0], new LocalTime[0],
                         desc, 0
-                ));
+                ), dbHelper.getCourse(code));
     }
 
     @Test
@@ -271,12 +385,11 @@ public class DatabaseTest {
         dbHelper.addCourse(new Course(name, code));
         dbHelper.changeCourseCapacity(code, cap);
 
-        assertEquals(dbHelper.getCourse(code),
-                new Course(
+        assertEquals(new Course(
                         name, code, null,
                         new DayOfWeek[0], new LocalTime[0], new LocalTime[0],
                         null, cap
-                ));
+                ), dbHelper.getCourse(code));
     }
 
 

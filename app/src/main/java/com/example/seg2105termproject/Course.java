@@ -56,15 +56,15 @@ public class Course {
 
     /**
      * Complete constructor for the Course class.
-     * @param id
-     * @param name
-     * @param code
-     * @param instructor
-     * @param days
-     * @param startTimes
-     * @param endTimes
-     * @param description
-     * @param capacity
+     * @param id            The integer id of the course.
+     * @param name          The standard name of the course.
+     * @param code          The code string of the course.
+     * @param instructor    The instructor of the course.
+     * @param days          The days the course is active.
+     * @param startTimes    The starting times of the course (correspondent to the days array).
+     * @param endTimes      The end times of the course (correspondent to the days array).
+     * @param description   The description of the course.
+     * @param capacity      The capacity of the course.
      * @throws IllegalArgumentException if the time arrays are not the same length.
      * @throws NullPointerException if any time array is null.
      */
@@ -88,14 +88,14 @@ public class Course {
 
     /**
      * The complete constructor, minus the course id.
-     * @param name
-     * @param code
-     * @param instructor
-     * @param days
-     * @param startTimes
-     * @param endTimes
-     * @param description
-     * @param capacity
+     * @param name          The standard name of the course.
+     * @param code          The code string of the course.
+     * @param instructor    The instructor of the course.
+     * @param days          The days the course is active.
+     * @param startTimes    The starting times of the course (correspondent to the days array).
+     * @param endTimes      The end times of the course (correspondent to the days array).
+     * @param description   The description of the course.
+     * @param capacity      The capacity of the course.
      * @throws IllegalArgumentException if the time arrays are not the same length.
      * @throws NullPointerException if any time array is null.
      */
@@ -106,7 +106,6 @@ public class Course {
         if (days == null || startTimes == null || endTimes == null) throw new NullPointerException();
         if (days.length != startTimes.length || days.length != endTimes.length) throw new IllegalArgumentException(TIME_ARRAYS_LENGTH_NOT_EQ);
 
-        this.id = id;
         this.name = name;
         this.code = code;
         this.instructor = instructor;

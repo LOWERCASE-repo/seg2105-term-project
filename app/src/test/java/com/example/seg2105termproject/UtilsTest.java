@@ -35,6 +35,17 @@ public class UtilsTest {
     }
 
     @Test
+    public void testCoursesToString(){
+        int[] intArray = {1,14,20,62,3};
+
+        String result = Utils.intArrayToString(intArray);
+
+        String actual = "1,14,20,62,3,";
+
+        assertEquals(result, actual);
+    }
+
+    @Test
     public void testParseDays(){
         String days = "MONDAY,WEDNESDAY,FRIDAY,";
 
@@ -54,6 +65,17 @@ public class UtilsTest {
         LocalTime[] actual = {LocalTime.of(8, 30),
                 LocalTime.of(10, 0),
                 LocalTime.of(15, 45)};
+
+        assertArrayEquals(result, actual);
+    }
+
+    @Test
+    public void testParseCourses(){
+        String integers = "1,14,20,62,3,";
+
+        int[] result = Utils.parseIntArray(integers);
+
+        int[] actual = {1,14,20,62,3};
 
         assertArrayEquals(result, actual);
     }
