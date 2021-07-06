@@ -90,11 +90,13 @@ public class MainActivity extends AppCompatActivity {
 
             } else {    // Must be student.
                 newUser = new Student(username, password);
+                Log.d("sysout", "creating student");
             }
 
             try {
                 dbHelper.addUser(newUser);
             } catch (IllegalArgumentException e){
+                Log.d("sysout", "" + e.toString());
                 Utils.createErrorDialog(this, R.string.user_already_exists);
             }
 

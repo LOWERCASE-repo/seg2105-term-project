@@ -3,6 +3,7 @@ package com.example.seg2105termproject;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.TextView;
 /**
  * This file is part of Course Booking application for Android devices
@@ -18,8 +19,8 @@ import android.widget.TextView;
 */
 public class StudentActivity extends AppCompatActivity {
 
-    TextView tvStudentName;
-
+    TextView tvStudentName, tvChosenCourse;
+    Button btnSearchCode, btnSearchName, btnSearchDay, btnToggleEnroll;
     Student student;
 
     @Override
@@ -28,6 +29,11 @@ public class StudentActivity extends AppCompatActivity {
         setContentView(R.layout.activity_student);
 
         tvStudentName = findViewById(R.id.tvStudentName);
+        tvChosenCourse = findViewById(R.id.tvChosenCourse);
+        btnSearchCode = findViewById(R.id.btnSearchCode);
+        btnSearchName = findViewById(R.id.btnSearchName);
+        btnSearchDay = findViewById(R.id.btnSearchDay);
+        btnToggleEnroll = findViewById(R.id.btnToggleEnroll);
 
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         Intent intent = getIntent();

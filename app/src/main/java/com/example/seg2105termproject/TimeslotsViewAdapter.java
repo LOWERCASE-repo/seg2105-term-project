@@ -19,7 +19,7 @@ import java.time.LocalTime;
  * University of Ottawa - Faculty of Engineering - SEG2105 -Course Booking application for Android devices
  * @author      Sally R       <sraad062@uottawa.ca>
  *              Jerry S       <jsoon029@uottawa.ca>
- *              Glen W        <@uottawa.ca>
+ *              Glen W        <gwang055@uottawa.ca>
  *              Youssef J     <yjall032@uottawa.ca>
  *
  */
