@@ -132,6 +132,11 @@ public class DatabaseTest {
         Course[] expected1 = {courses[0], courses[1], courses[2], courses[3], courses[4]};
 
         assertArrayEquals(expected1, result1);
+        assertTrue(dbHelper.checkEnrolled(name, 1));
+        assertTrue(dbHelper.checkEnrolled(name, 2));
+        assertTrue(dbHelper.checkEnrolled(name, 3));
+        assertTrue(dbHelper.checkEnrolled(name, 4));
+        assertTrue(dbHelper.checkEnrolled(name, 5));
 
         // Try removeEnrolledCourse
         dbHelper.removeEnrolledCourse(name, courses[3].getId());
@@ -139,6 +144,11 @@ public class DatabaseTest {
         Course[] expected2 = {courses[0], courses[1], courses[2], courses[4]};
 
         assertArrayEquals(expected2, result2);
+        assertTrue(dbHelper.checkEnrolled(name, 1));
+        assertTrue(dbHelper.checkEnrolled(name, 2));
+        assertTrue(dbHelper.checkEnrolled(name, 3));
+        assertFalse(dbHelper.checkEnrolled(name, 4));
+        assertTrue(dbHelper.checkEnrolled(name, 5));
     }
 
 

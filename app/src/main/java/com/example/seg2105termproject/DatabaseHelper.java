@@ -444,7 +444,58 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
     }
 
-    // TODO checkEnrolled(), and make sure you can't enroll twice
+    /**
+     * Returns a boolean of if the student with the passed username is already enrolled to the
+     * course with the passed id.
+     * @param username  The username of the student that's being checked for enrollment.
+     * @param targetId  The id of the course that's being checked for enrollment.
+     * @return  A boolean representing if the student with the passed username is enrolled to the
+     *          course with the passed id.
+     * @throws IllegalArgumentException if the student was not found, or the username does not
+     *                                  belong to a student.
+     */
+    public boolean checkEnrolled(String username, int targetId) throws IllegalArgumentException {
+        // Get reference to readable database.
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Create cursor object with query.
+        Cursor cursor = db.query(
+                Accounts.TABLE_NAME,
+                new String[]{Accounts.COLUMN_USER_TYPE, Accounts.COLUMN_ENROLLED_COURSES},
+                Accounts.COLUMN_USERNAME + " = ?",
+                new String[]{username},
+                null,
+                null,
+                null);
+
+        // If course not found, throw exception.
+        if (!cursor.moveToFirst()) {
+            throwExceptionAndClose(db, cursor, new IllegalArgumentException());
+        }
+
+        // Check if the UserType of the passed user(name) is of STUDENT.
+        UserType type = UserType.valueOf(cursor.getString(0));
+        if (type != UserType.STUDENT) {
+            throwExceptionAndClose(db, cursor, new IllegalArgumentException("Passed user is not a Student"));
+        }
+
+        // Get the array of enrolled courses' ids.
+        int[] courseIds = Utils.parseIntArray(cursor.getString(1));
+
+        // Close the database and cursor. Won't been needing it after this point.
+        db.close();
+        cursor.close();
+
+        // Loop to find course id.
+        for (int courseId : courseIds){
+            if (courseId == targetId) {
+                return true;
+            }
+        }
+
+        // If the method has not returned true, then return false.
+        return false;
+    }
 
     /**
      * Change the course code, with validation

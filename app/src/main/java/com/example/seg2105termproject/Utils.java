@@ -47,11 +47,11 @@ public class Utils {
 
         StringBuffer buffer = new StringBuffer();
 
-        for (int i = 0; i < days.length; i++){
+        for (DayOfWeek day : days){
 
             // Ignore null cases.
-            if (days[i] != null){
-                buffer.append(days[i].toString());
+            if (day != null){
+                buffer.append(day.toString());
                 buffer.append(",");
             }
         }
@@ -72,11 +72,11 @@ public class Utils {
 
         StringBuffer buffer = new StringBuffer();
 
-        for (int i = 0; i < times.length; i++){
+        for (LocalTime time : times){
 
             // Ignore null cases.
-            if (times[i] != null){
-                buffer.append(times[i].toString());
+            if (time != null){
+                buffer.append(time.toString());
                 buffer.append(",");
             }
         }
@@ -94,8 +94,8 @@ public class Utils {
 
         StringBuffer buffer = new StringBuffer();
 
-        for (int i = 0; i < intArray.length; i++){
-            buffer.append(intArray[i]);
+        for (int integer : intArray){
+            buffer.append(integer);
             buffer.append(",");
         }
 
