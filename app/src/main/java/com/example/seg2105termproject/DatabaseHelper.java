@@ -444,6 +444,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
     }
 
+    // TODO checkEnrolled()
+
     /**
      * Change the course code, with validation
      * @param oldCode The current course code

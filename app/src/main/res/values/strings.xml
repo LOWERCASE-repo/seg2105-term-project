@@ -96,5 +96,12 @@
     <string name="not_course_instructor">You are not the instructor of this course.\nYou may not change the details of this course.</string>
     <string name="timeslot_not_found">No timeslot was selected.\nThis error is not supposed to occur during natural runtime...</string>
 
+    <string name="enrolled">Enrolled.</string>
+    <string name="unenrolled">Unenrolled.</string>
+    <string name="enroll_unenroll">Enroll / Unenroll</string>
+    <string name="search_by_day">Search By Day</string>
+    <string name="search_by_code">Search By Code</string>
+    <string name="search_by_name">Search By Name</string>
+
 
 </resources>
