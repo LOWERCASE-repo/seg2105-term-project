@@ -909,6 +909,64 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Returns an array of courses in the database that is active on the passed day.
+     * @param day   The day to search for a course by.
+     * @return  A reference to an array of courses that are active on the passed day.
+     * @throws IllegalArgumentException if no courses are active on the passed day.
+     */
+    public Course[] getCoursesFromDay (DayOfWeek day) throws IllegalArgumentException{
+        // Get reference to writable database.
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Create the selection string for the query.
+        String daySelection = CourseTable.COLUMN_COURSE_DAYS + " LIKE ? OR " +
+                CourseTable.COLUMN_COURSE_DAYS + " LIKE ?";
+
+        // Create patterns for SQL LIKE operator.
+        String[] dayPatterns = {
+                "%," + day.toString() + ",%",
+                day.toString() + ",%"
+        };
+
+        // Order the courses in order of ascending IDs.
+        String orderBy = CourseTable._ID + " ASC";
+
+        // Find courses active on the passed day.
+        Cursor cursor = db.query(
+                CourseTable.TABLE_NAME,
+                null,
+                daySelection,
+                dayPatterns,
+                null,
+                null,
+                orderBy
+        );
+
+        Course[] courses = null;
+
+        // If courses were found,
+        if (cursor.moveToFirst()){
+            int i = 0;
+            courses = new Course[cursor.getCount()];
+
+            do {
+                courses[i++] = constructCourse(cursor);
+            } while (cursor.moveToNext());
+
+        } else {
+            // If no courses were not found, throw exception.
+            throwExceptionAndClose(db, cursor, new IllegalArgumentException());
+        }
+
+        // Close database and cursor.
+        db.close();
+        cursor.close();
+
+        // Return the array.
+        return courses;
+    }
+
+    /**
      * Instantiates and returns the reference to an array containing all Users in the database.
      * @return  An array containing all Users in the database.
      */
