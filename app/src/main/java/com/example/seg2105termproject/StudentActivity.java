@@ -151,30 +151,24 @@ public class StudentActivity extends AppCompatActivity {
      * @param view  The view that calls this method.
      */
     public void toggleEnroll(View view) {
-//        if (course == null) {
-//            Utils.createErrorDialog(this, R.string.no_course);
-//            return;
-//        }
-//        DatabaseHelper dbHelper = new DatabaseHelper(this);
-//
-//        if (course.getInstructor() == null) {
-//
-//            dbHelper.addEnrolledCourse(student.getUsername(), course.getId());
-//            Utils.createErrorDialog(this, R.string.enrolled); // maybe don't use error dialog for this
-//            update(course);
-//
-//        } else if (course.getInstructor().equals(instructor)) {
-//
-//            // Set the course instructor to null.
-//            dbHelper.changeCourseInstructor(course.getCode(), null);
-//
-//            // To save on resources (and not call another database open), simply set the
-//            // selected course's instructor and update the views.
-//            course.setInstructor(null);
-//            update(course);
-//
-//        } else {
-//            Utils.createErrorDialog(this, R.string.course_claimed);
-//        }
+        if (course == null) {
+            Utils.createErrorDialog(this, R.string.no_course);
+            return;
+        }
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+
+        if (!dbHelper.checkEnrolled(student.getUsername(), course.getId())) {
+
+            dbHelper.addEnrolledCourse(student.getUsername(), course.getId());
+            Utils.createErrorDialog(this, R.string.enrolled); // maybe don't use error dialog for this
+            update(course);
+
+        } else {
+
+            dbHelper.removeEnrolledCourse(student.getUsername(), course.getId());
+            Utils.createErrorDialog(this, R.string.unenrolled); // maybe don't use error dialog for this
+            update(course);
+
+        }
     }
 }
