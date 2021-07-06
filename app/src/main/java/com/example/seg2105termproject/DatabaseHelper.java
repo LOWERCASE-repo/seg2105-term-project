@@ -444,7 +444,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
     }
 
-    // TODO checkEnrolled()
+    // TODO checkEnrolled(), and make sure you can't enroll twice
 
     /**
      * Change the course code, with validation
