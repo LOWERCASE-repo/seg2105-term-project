@@ -71,6 +71,8 @@
     <string name="capacity_label">Capacity:</string>
     <string name="description_label">Description:</string>
 
+    <string name="enrolled_courses_label">Enrolled Courses:</string>
+
 
     <string name="timetable_edit_label">Select a timeslot to edit it:</string>
     <string name="day_label">Day:</string>
@@ -95,6 +97,14 @@
     <string name="negative_capacity">Course capacity can\'t be negative.</string>
     <string name="not_course_instructor">You are not the instructor of this course.\nYou may not change the details of this course.</string>
     <string name="timeslot_not_found">No timeslot was selected.\nThis error is not supposed to occur during natural runtime...</string>
+    <string name="no_courses_on_day">No courses are active on the selected day.</string>
+
+    <string name="enrolled">Enrolled.</string>
+    <string name="unenrolled">Unenrolled.</string>
+    <string name="enroll_unenroll">Enroll / Unenroll</string>
+    <string name="search_by_day">Search By Day</string>
+    <string name="search_by_code">Search By Code</string>
+    <string name="search_by_name">Search By Name</string>
 
 
 </resources>
