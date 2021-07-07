@@ -244,7 +244,7 @@ public class StudentActivity extends AppCompatActivity {
         builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                update(dbHelper.getCourse(coursesOnDay[selectedIndex[0]].getCode()));
+                update(coursesOnDay[selectedIndex[0]]);
             }
         });
 
