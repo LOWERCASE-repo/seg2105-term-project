@@ -402,5 +402,50 @@ public class DatabaseTest {
                 ), dbHelper.getCourse(code));
     }
 
+    @Test
+    public void testGetCoursesByDay(){
+        Course[] courses = {
+                new Course("A", "A", null,
+                        new DayOfWeek[]{DayOfWeek.MONDAY},
+                        new LocalTime[]{LocalTime.of(8, 30)},
+                        new LocalTime[]{LocalTime.NOON},
+                        null,
+                        0),
+                new Course("B", "B", null,
+                        new DayOfWeek[]{DayOfWeek.MONDAY, DayOfWeek.THURSDAY},
+                        new LocalTime[]{LocalTime.of(8, 30), LocalTime.NOON},
+                        new LocalTime[]{LocalTime.NOON, LocalTime.of(15, 45)},
+                        null,
+                        0),
+                new Course("C", "C", null,
+                        new DayOfWeek[]{DayOfWeek.TUESDAY},
+                        new LocalTime[]{LocalTime.of(8, 30)},
+                        new LocalTime[]{LocalTime.NOON},
+                        null,
+                        0),
+                new Course("D", "D", null,
+                        new DayOfWeek[]{DayOfWeek.SATURDAY, DayOfWeek.MONDAY, DayOfWeek.FRIDAY},
+                        new LocalTime[]{LocalTime.of(8, 30), LocalTime.of(10, 30), LocalTime.MIDNIGHT},
+                        new LocalTime[]{LocalTime.NOON, LocalTime.MIDNIGHT, LocalTime.of(4, 50)},
+                        null,
+                        0),
+                new Course("E", "E", null,
+                        new DayOfWeek[]{},
+                        new LocalTime[]{},
+                        new LocalTime[]{},
+                        null,
+                        0),
+        };
+
+        for (Course course : courses){
+            dbHelper.addCourse(course);
+        }
+
+        Course[] result = dbHelper.getCoursesFromDay(DayOfWeek.MONDAY);
+        Course[] expected = {courses[0], courses[1], courses[3]};
+
+        assertArrayEquals(expected, result);
+    }
+
 
 }

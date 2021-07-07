@@ -3,6 +3,7 @@ package com.example.seg2105termproject;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
@@ -138,7 +139,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Insert the entry into the Accounts table of the database, throw an error if we
         // invalidate the unique constraint.
-        if (db.insert(Accounts.TABLE_NAME, null, values) == -1) {
+        try{
+            if (db.insert(Accounts.TABLE_NAME, null, values) == -1) {
+                throw new SQLiteConstraintException();
+            }
+        } catch (SQLiteConstraintException e) {
             throwExceptionAndClose(db, null, new IllegalArgumentException());
         }
 
