@@ -39,7 +39,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         private static final String COLUMN_USER_TYPE = "User_Type";
         private static final String COLUMN_USERNAME = "Username";
         private static final String COLUMN_PASSWORD = "Password";
-        private static final String COLUMN_ENROLLED_COURSES = "Enrolled_Courses";
     }
 
     // CourseTable table for Course objects.
@@ -55,6 +54,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         private static final String COLUMN_COURSE_CAPACITY = "Course_Capacity";
     }
 
+    // Enrollment table to keep track of enrollments.
+    private static class Enrollment implements BaseColumns {
+        private static final String TABLE_NAME = "Enrollment";
+        private static final String COLUMN_STUDENT_ID = "Student_ID";
+        private static final String COLUMN_COURSE_ID = "Course_ID";
+    }
+
 
     /**
      * The following constants are SQL queries to create and delete the two tables.
@@ -64,8 +70,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     Accounts._ID + " INTEGER PRIMARY KEY," +
                     Accounts.COLUMN_USER_TYPE + " TEXT," +
                     Accounts.COLUMN_USERNAME + " TEXT UNIQUE," +
-                    Accounts.COLUMN_PASSWORD + " TEXT," +
-                    Accounts.COLUMN_ENROLLED_COURSES + " TEXT)";
+                    Accounts.COLUMN_PASSWORD + " TEXT)";
 
     private static final String SQL_CREATE_COURSETABLE =
             "CREATE TABLE " + CourseTable.TABLE_NAME + " (" +
@@ -79,11 +84,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     CourseTable.COLUMN_COURSE_DESC + " TEXT," +
                     CourseTable.COLUMN_COURSE_CAPACITY + " INTEGER)";
 
+    private static final String SQL_CREATE_ENROLLMENT =
+            "CREATE TABLE " + Enrollment.TABLE_NAME + " (" +
+                    Enrollment._ID + " INTEGER PRIMARY KEY," +
+                    Enrollment.COLUMN_STUDENT_ID + " INTEGER," +
+                    Enrollment.COLUMN_COURSE_ID + " INTEGER," +
+                    "FOREIGN KEY(" + Enrollment.COLUMN_STUDENT_ID + ") REFERENCES " +
+                        Accounts.TABLE_NAME + "(" + Accounts._ID + ")," +
+                    "FOREIGN KEY(" + Enrollment.COLUMN_COURSE_ID + ") REFERENCES " +
+                        CourseTable.TABLE_NAME + "(" + CourseTable._ID + "))";
+
     private static final String SQL_DELETE_ACCOUNTS =
             "DROP TABLE IF EXISTS " + Accounts.TABLE_NAME;
 
     private static final String SQL_DELETE_COURSETABLE =
             "DROP TABLE IF EXISTS " + CourseTable.TABLE_NAME;
+
+    private static final String SQL_DELETE_ENROLLMENT =
+            "DROP TABLE IF EXISTS " + Enrollment.TABLE_NAME;
 
     /**
      * A string constant of an empty string, used as a blank for table values.
@@ -105,12 +123,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db){
         db.execSQL(SQL_CREATE_ACCOUNTS);
         db.execSQL(SQL_CREATE_COURSETABLE);
+        db.execSQL(SQL_CREATE_ENROLLMENT);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
         db.execSQL(SQL_DELETE_ACCOUNTS);
         db.execSQL(SQL_DELETE_COURSETABLE);
+        db.execSQL(SQL_DELETE_ENROLLMENT);
         onCreate(db);
     }
 
@@ -131,16 +151,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(Accounts.COLUMN_USERNAME, user.getUsername());
         values.put(Accounts.COLUMN_PASSWORD, user.getPassword());
 
-        if (user.getType() == UserType.STUDENT){
-            values.put(Accounts.COLUMN_ENROLLED_COURSES, Utils.intArrayToString(user.getEnrolledCourses()));
-        } else {
-            values.put(Accounts.COLUMN_ENROLLED_COURSES, EMPTY);
-        }
-
         // Insert the entry into the Accounts table of the database, throw an error if we
         // invalidate the unique constraint.
         try{
             if (db.insert(Accounts.TABLE_NAME, null, values) == -1) {
+
+                // For some reason, the insert method can throw this exception instead of
+                // returning -1. This is just a shoddy work-around at the moment.
                 throw new SQLiteConstraintException();
             }
         } catch (SQLiteConstraintException e) {
@@ -187,9 +204,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Insert the entry into the CourseTable table of the database, throw an error if we
         // invalidate the unique constraint.
-        if (db.insert(CourseTable.TABLE_NAME, null, values) == -1) {
+        try{
+            if (db.insert(CourseTable.TABLE_NAME, null, values) == -1) {
+
+                // For some reason, the insert method can throw this exception instead of
+                // returning -1. This is just a shoddy work-around at the moment.
+                throw new SQLiteConstraintException();
+            }
+        } catch (SQLiteConstraintException e) {
             Log.d("sysout", "add course failed");
-            throw new IllegalArgumentException();
+            throwExceptionAndClose(db, null, new IllegalArgumentException());
         }
 
         // Close the reference.
@@ -266,40 +290,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // If the course was not found, throw exception.
         if (!cursor.moveToFirst()) throwExceptionAndClose(db, cursor, new IllegalArgumentException());
 
-        // Get the id of the course.
-        int id = Integer.parseInt(cursor.getString(0));
+        // Create the selection and corresponding selectionArgs string(s) for enrollment deletion.
+        String idSelection = Enrollment.COLUMN_COURSE_ID + " = ?";
+        String[] idSelectionArgs = {cursor.getString(0)};
 
-        // Create the selection string for the query.
-        String idSelection = Accounts.COLUMN_ENROLLED_COURSES + " LIKE ? OR " +
-                Accounts.COLUMN_ENROLLED_COURSES + " LIKE ?";
-
-        // Create patterns for SQL LIKE operator.
-        String[] idPatterns = {
-                "%," + id + ",%",
-                id + ",%"
-        };
-
-        // Find all students enrolled in the course.
-        Cursor userCursor = db.query(
-                Accounts.TABLE_NAME,
-                new String[]{Accounts.COLUMN_USERNAME},
+        // Delete any enrollments to the course.
+        db.delete(
+                Enrollment.TABLE_NAME,
                 idSelection,
-                idPatterns,
-                null,
-                null,
-                null
-        );
-
-        // For each student enrolled in the course, unenroll them.
-        if (userCursor.moveToFirst()){
-            do {
-                removeEnrolledCourse(userCursor.getString(0), id);
-            } while (userCursor.moveToNext());
-
-            // Since #removeEnrolledCourse(String, int) will close the database reference
-            // (seems to be one reference overall), reopen the reference afterwards.
-            db = this.getWritableDatabase();
-        }
+                idSelectionArgs);
 
         // Delete the course.
         db.delete(
@@ -310,16 +309,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Regardless of success or not, close the database.
         db.close();
         cursor.close();
-        userCursor.close();
     }
 
     /**
-     * @param username The student adding the course
-     * @param courseId The id of the course being added
+     * @param userId    The id of the student adding the course
+     * @param courseId  The id of the course being added
      * @return whether the timeslots of the given course conflicts with any other in the given
      * students enrolled courses
      */
-    public boolean timeSlotConflicts(String username, int courseId) {
+    public boolean timeSlotConflicts(int userId, int courseId) {
 
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
@@ -414,194 +412,102 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Adds a course to a Student's enrolled courses attribute.
-     * @param username  The username of the student, enrolling to a course.
-     * @param targetId  The id of the course the student is enrolling to.
-     * @throws IllegalArgumentException if the student was not found, or the username does not
-     *                                  belong to a student.
+     * @param userId    The id of the student, enrolling to a course.
+     * @param courseId  The id of the course the student is enrolling to.
+     * @throws IllegalArgumentException if the student was not found.
      */
-    public void addEnrolledCourse(String username, int targetId) throws IllegalArgumentException {
+    public void addEnrolledCourse(int userId, int courseId) throws IllegalArgumentException {
 
-        if (timeSlotConflicts(username, targetId)) {
+        if (timeSlotConflicts(userId, courseId)) {
             throw new IllegalArgumentException("Could not add course due to timeslot conflict.");
         }
+
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
 
-        // Create cursor object with query.
-        Cursor cursor = db.query(
-                Accounts.TABLE_NAME,
-                new String[]{Accounts.COLUMN_USER_TYPE, Accounts.COLUMN_ENROLLED_COURSES},
-                Accounts.COLUMN_USERNAME + " = ?",
-                new String[]{username},
-                null,
-                null,
-                null);
-
-        // If course not found, throw exception.
-        if (!cursor.moveToFirst()) {
-            throwExceptionAndClose(db, cursor, new IllegalArgumentException());
-        }
-
-        // Check if the UserType of the passed user(name) is of STUDENT.
-        UserType type = UserType.valueOf(cursor.getString(0));
-        if (type != UserType.STUDENT) {
-            throwExceptionAndClose(db, cursor, new IllegalArgumentException("Passed user is not a Student"));
-        }
-
-        // Since only the user type and enrolled courses column were queried,
-        // the column index of enrolled courses is 1.
-        String newCourseIds = cursor.getString(1) + targetId + ",";
-
-        // Create content values container. Insert the new courseIds string.
+        // Instantiate content values container to insert values.
         ContentValues values = new ContentValues();
-        values.put(Accounts.COLUMN_ENROLLED_COURSES, newCourseIds);
+        values.put(Enrollment.COLUMN_STUDENT_ID, userId);
+        values.put(Enrollment.COLUMN_COURSE_ID, courseId);
 
-        // Update the database.
-        db.update(
-                Accounts.TABLE_NAME,
-                values,
-                Accounts.COLUMN_USERNAME + " = ?",
-                new String[]{username});
+        // If foreign key constraint is invalidated?
+        try{
+            if (db.insert(Enrollment.TABLE_NAME, null, values) == -1) {
 
-        // Close the database and cursor.
+                // For some reason, the insert method can throw this exception instead of
+                // returning -1. This is just a shoddy work-around at the moment.
+                throw new SQLiteConstraintException();
+            }
+        } catch (SQLiteConstraintException e) {
+            throwExceptionAndClose(db, null, new IllegalArgumentException());
+        }
+
+        // Close the database.
         db.close();
-        cursor.close();
     }
 
     /**
      * Deletes a course from a Student's enrolled courses attribute.
-     * @param username  The username of the student, unenrolling from a course.
-     * @param targetId  The id of the course the student is unenrolling from.
-     * @throws IllegalArgumentException if the student was not found, the username does not belong
-     *                                  to a student, or the student was not enrolled to the passed
-     *                                  course.
-     * @throws IllegalStateException    if the student is not enrolled in any courses.
+     * @param userId    The id of the student, unenrolling from a course.
+     * @param courseId  The id of the course the student is unenrolling from.
+     * @throws IllegalArgumentException if the student was not found, or the student was not
+     *                                  enrolled to the passed course.
      */
-    public void removeEnrolledCourse (String username, int targetId) throws IllegalArgumentException, IllegalStateException {
+    public void removeEnrolledCourse (int userId, int courseId) throws IllegalArgumentException {
 
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
 
-        // Create cursor object with query.
-        Cursor cursor = db.query(
-                Accounts.TABLE_NAME,
-                new String[]{Accounts.COLUMN_USER_TYPE, Accounts.COLUMN_ENROLLED_COURSES},
-                Accounts.COLUMN_USERNAME + " = ?",
-                new String[]{username},
-                null,
-                null,
-                null);
+        // SQL deletion strings.
+        String whereClause =
+                Enrollment.COLUMN_STUDENT_ID + " = ? AND " +
+                Enrollment.COLUMN_COURSE_ID + " = ?";
+        String[] whereArgs = {Integer.toString(userId), Integer.toString(courseId)};
 
-        // If course not found, throw exception.
-        if (!cursor.moveToFirst()) {
-            throwExceptionAndClose(db, cursor, new IllegalArgumentException());
-        }
-
-        // Check if the UserType of the passed user(name) is of STUDENT.
-        UserType type = UserType.valueOf(cursor.getString(0));
-        if (type != UserType.STUDENT) {
-            throwExceptionAndClose(db, cursor, new IllegalArgumentException("Passed user is not a Student"));
-        }
-
-        // Get the integer array of course ids.
-        int[] courseIds = Utils.parseIntArray(cursor.getString(1));
-
-        // If the Student has not enrolled into any course, then it is impossible to unenroll.
-        // Therefore, throw exception.
-        if (courseIds.length < 1) {
-            throwExceptionAndClose(db, cursor, new IllegalArgumentException());
-        }
-
-        // Instance new array, of one size smaller.
-        int[] newCourseIds = new int[courseIds.length - 1];
-        int index = 0;
-
-        // For each course id,
-        for (int courseId : courseIds){
-
-            // Save it to the new array, if it's not the id of the passed course.
-            if (courseId != targetId){
-
-                // Should an ArrayIndexOutOfBoundsException be thrown (from int index incrementing
-                // too far), it means that the Student was not enrolled in the passed course.
-                try {
-                    newCourseIds[index] = courseId;
-                } catch (ArrayIndexOutOfBoundsException e){
-                    throwExceptionAndClose(db, cursor, new IllegalArgumentException("Student was not enrolled in passed course"));
-                }
-
-                index++;
-            }
-        }
-
-        // Create content values container. Insert the new courseIds string.
-        ContentValues values = new ContentValues();
-        values.put(Accounts.COLUMN_ENROLLED_COURSES, Utils.intArrayToString(newCourseIds));
-
-        // Update the database.
-        db.update(
-                Accounts.TABLE_NAME,
-                values,
-                Accounts.COLUMN_USERNAME + " = ?",
-                new String[]{username}
-        );
+        // Delete the corresponding entries in the Enrollment table.
+        int result = db.delete(Enrollment.TABLE_NAME, whereClause, whereArgs);
 
         // Close the database.
         db.close();
-        cursor.close();
+
+        if (result == 0) throw new IllegalArgumentException();
     }
 
     /**
      * Returns a boolean of if the student with the passed username is already enrolled to the
      * course with the passed id.
-     * @param username  The username of the student that's being checked for enrollment.
-     * @param targetId  The id of the course that's being checked for enrollment.
+     * @param userId    The id of the student that's being checked for enrollment.
+     * @param courseId  The id of the course that's being checked for enrollment.
      * @return  A boolean representing if the student with the passed username is enrolled to the
      *          course with the passed id.
-     * @throws IllegalArgumentException if the student was not found, or the username does not
-     *                                  belong to a student.
      */
-    public boolean checkEnrolled(String username, int targetId) throws IllegalArgumentException {
+    public boolean checkEnrolled(int userId, int courseId) {
         // Get reference to readable database.
         SQLiteDatabase db = this.getReadableDatabase();
 
+        // SQL selection strings.
+        String selection = Enrollment.COLUMN_STUDENT_ID + " = ? AND " + Enrollment.COLUMN_COURSE_ID + " = ?";
+        String[] selectionArgs = {Integer.toString(userId), Integer.toString(courseId)};
+
         // Create cursor object with query.
         Cursor cursor = db.query(
-                Accounts.TABLE_NAME,
-                new String[]{Accounts.COLUMN_USER_TYPE, Accounts.COLUMN_ENROLLED_COURSES},
-                Accounts.COLUMN_USERNAME + " = ?",
-                new String[]{username},
+                Enrollment.TABLE_NAME,
+                null,
+                selection,
+                selectionArgs,
                 null,
                 null,
                 null);
 
-        // If course not found, throw exception.
-        if (!cursor.moveToFirst()) {
-            throwExceptionAndClose(db, cursor, new IllegalArgumentException());
-        }
+        // Get the result.
+        boolean result = cursor.moveToFirst();
 
-        // Check if the UserType of the passed user(name) is of STUDENT.
-        UserType type = UserType.valueOf(cursor.getString(0));
-        if (type != UserType.STUDENT) {
-            throwExceptionAndClose(db, cursor, new IllegalArgumentException("Passed user is not a Student"));
-        }
-
-        // Get the array of enrolled courses' ids.
-        int[] courseIds = Utils.parseIntArray(cursor.getString(1));
-
-        // Close the database and cursor. Won't been needing it after this point.
+        // Close the database and cursor.
         db.close();
         cursor.close();
 
-        // Loop to find course id.
-        for (int courseId : courseIds){
-            if (courseId == targetId) {
-                return true;
-            }
-        }
-
         // If the method has not returned true, then return false.
-        return false;
+        return result;
     }
 
     /**
@@ -693,6 +599,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(CourseTable.COLUMN_COURSE_END_TIMES, EMPTY);
             values.put(CourseTable.COLUMN_COURSE_DESC, EMPTY);
             values.put(CourseTable.COLUMN_COURSE_CAPACITY, 0);
+
+            Cursor cursor = db.query(
+                    CourseTable.TABLE_NAME,
+                    new String[]{CourseTable._ID},
+                    CourseTable.COLUMN_COURSE_CODE + " LIKE ?",
+                    new String[]{code},
+                    null, null, null
+            );
+
+            if (!cursor.moveToFirst()) throwExceptionAndClose(db, cursor, new IllegalArgumentException());
+
+            String selection = Enrollment.COLUMN_COURSE_ID + " = ?";
+            String[] selectionArgs = {cursor.getString(0)};
+            cursor.close();
+
+            db.delete(
+                    Enrollment.TABLE_NAME,
+                    selection,
+                    selectionArgs
+            );
 
         } else {
             values.put(CourseTable.COLUMN_COURSE_INSTRUCTOR, instructor.getUsername());
@@ -1136,18 +1062,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String query = "SELECT * FROM " + Accounts.TABLE_NAME;
         Cursor cursor = db.rawQuery(query, null);
 
-        User[] users;
-        if (cursor.moveToFirst()){
-            int i = 0;
-            users = new User[cursor.getCount()];
+        User[] users = new User[cursor.getCount()];
+        int i = 0;
 
-            do {
-                users[i++] = constructUserSubclass(cursor);
-
-            } while (cursor.moveToNext());
-
-        } else {
-            users = new User[0];
+        while(cursor.moveToNext()) {
+            users[i++] = constructUserSubclass(cursor);
         }
 
         cursor.close();
@@ -1165,18 +1084,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String query = "SELECT * FROM " + CourseTable.TABLE_NAME;
         Cursor cursor = db.rawQuery(query, null);
 
-        Course[] courses;
-        if (cursor.moveToFirst()){
-            int i = 0;
-            courses = new Course[cursor.getCount()];
+        Course[] courses = new Course[cursor.getCount()];
+        int i = 0;
 
-            do {
-                courses[i++] = constructCourse(cursor);
-
-            } while (cursor.moveToNext());
-
-        } else {
-            courses = new Course[0];
+        while(cursor.moveToNext()){
+            courses[i++] = constructCourse(cursor);
         }
 
         cursor.close();
@@ -1185,37 +1097,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Returns an array of courses the passed Student is enrolled to.
-     * @param username  The username of the Student.
+     * Returns an array of courses the passed Student is enrolled to in order of
+     * ascending course id.
+     * @param userId    The username of the Student.
      * @return  The array of courses the passed Student is enrolled to.
-     * @throws IllegalArgumentException if the student was not found, or the username does not
-     *                                  belong to a student.
+     * @throws IllegalArgumentException if the student was not found, or an enrolled course was
+     *                                  not found.
      */
-    public Course[] getEnrolledCourses(String username) throws IllegalArgumentException{
+    public Course[] getEnrolledCourses(int userId) throws IllegalArgumentException{
         // Get reference to writable database (is writable for cleaning course ids).
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Create cursor object with query.
         Cursor cursor = db.query(
-                Accounts.TABLE_NAME,
-                new String[]{Accounts.COLUMN_USER_TYPE, Accounts.COLUMN_ENROLLED_COURSES},
-                Accounts.COLUMN_USERNAME + " = ?",
-                new String[]{username},
+                Enrollment.TABLE_NAME,
+                new String[]{Enrollment.COLUMN_COURSE_ID},
+                Enrollment.COLUMN_STUDENT_ID + " = ?",
+                new String[]{Integer.toString(userId)},
                 null,
                 null,
-                null);
+                Enrollment.COLUMN_COURSE_ID + " ASC");
 
-        // If course not found, throw exception.
-        if (!cursor.moveToFirst()) throwExceptionAndClose(db, cursor, new IllegalArgumentException());
-
-        // Check if the UserType of the passed user(name) is of STUDENT.
-        UserType type = UserType.valueOf(cursor.getString(0));
-        if (type != UserType.STUDENT) throwExceptionAndClose(db, cursor, new IllegalArgumentException("Passed user is not a Student"));
-
-        // In order to use .query(...), the course ids need to be translated to Strings.
-        // Construct the integer and String arrays.
-        int[] courseIds = Utils.parseIntArray(cursor.getString(1));
-        String[] strCourseIds = new String[courseIds.length];
+        // Instantiate array to hold integer strings.
+        String[] strCourseIds = new String[cursor.getCount()];
+        int i = 0;
 
         // In the meantime, the SQL WHERE clauses need to be constructed as well, with one
         // ? per course id.
@@ -1224,15 +1129,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         whereStatement.append(" IN (");
 
         // For each course id,
-        for (int i = 0; i < courseIds.length; i++){
-            // Convert to String.
-            strCourseIds[i] = Integer.toString(courseIds[i]);
+        while(cursor.moveToNext()){
+            // Save it into the array.
+            strCourseIds[i++] = cursor.getString(0);
 
             // Append a ? to the WHERE clause.
             whereStatement.append("?");
 
             // Do not add a comma for the last course id.
-            if (i != courseIds.length - 1) whereStatement.append(",");
+            if (!cursor.isLast()) whereStatement.append(",");
         }
 
         // Finish off the bracket.
@@ -1248,20 +1153,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 CourseTable._ID + " ASC"
         );
 
-        Course[] enrolledCourses;
-
+        Course[] enrolledCourses = new Course[courseCursor.getCount()];
+        int j = 0;
         // If courses of the ids were found in the database,
-        if (courseCursor.moveToFirst()){
-            int i = 0;
-            enrolledCourses = new Course[courseCursor.getCount()];
-
-            // Add all courses to array.
-            do {
-                enrolledCourses[i++] = constructCourse(courseCursor);
-            } while (courseCursor.moveToNext());
-
-        } else {
-            enrolledCourses = new Course[0];
+        while (courseCursor.moveToNext()){
+            enrolledCourses[j++] = constructCourse(courseCursor);
         }
 
         // Close the database and cursors.
@@ -1311,8 +1207,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 user = new Student(
                         cursor.getInt(0),
                         cursor.getString(2),
-                        cursor.getString(3),
-                        Utils.parseIntArray(cursor.getString(4))
+                        cursor.getString(3)
                 );
                 break;
 

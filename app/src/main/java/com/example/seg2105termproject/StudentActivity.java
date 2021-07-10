@@ -65,7 +65,7 @@ public class StudentActivity extends AppCompatActivity {
         Intent intent = getIntent();
         student = (Student) dbHelper.getUser(intent.getStringExtra(MainActivity.EXTRA_USER));
 
-        cAdapter = new CoursesViewAdapter(dbHelper.getEnrolledCourses(student.getUsername()));
+        cAdapter = new CoursesViewAdapter(dbHelper.getEnrolledCourses(student.getId()));
         LinearLayoutManager coursesLayoutManager = new LinearLayoutManager(this);
         enrolledCoursesView.setLayoutManager(coursesLayoutManager);
         enrolledCoursesView.setAdapter(cAdapter);
@@ -82,7 +82,7 @@ public class StudentActivity extends AppCompatActivity {
         tvChosenCourse.setText(String.format("%s — %s", course.getCode(), course.getName()));
 
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        cAdapter.refresh(dbHelper.getEnrolledCourses(student.getUsername()));
+        cAdapter.refresh(dbHelper.getEnrolledCourses(student.getId()));
     }
 
     /**
@@ -268,9 +268,9 @@ public class StudentActivity extends AppCompatActivity {
         }
         DatabaseHelper dbHelper = new DatabaseHelper(this);
 
-        if (!dbHelper.checkEnrolled(student.getUsername(), course.getId())) {
+        if (!dbHelper.checkEnrolled(student.getId(), course.getId())) {
             try {
-                dbHelper.addEnrolledCourse(student.getUsername(), course.getId());
+                dbHelper.addEnrolledCourse(student.getId(), course.getId());
             } catch (IllegalArgumentException e) {
                 Utils.createErrorDialog(self, R.string.timeslot_conflict);
             }
@@ -278,7 +278,7 @@ public class StudentActivity extends AppCompatActivity {
 
         } else {
 
-            dbHelper.removeEnrolledCourse(student.getUsername(), course.getId());
+            dbHelper.removeEnrolledCourse(student.getId(), course.getId());
             update(course);
 
         }

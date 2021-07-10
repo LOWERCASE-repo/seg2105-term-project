@@ -89,8 +89,7 @@ public class MainActivity extends AppCompatActivity {
                 newUser = new Instructor(username, password);
 
             } else {    // Must be student.
-//                newUser = new Student(username, password);
-                newUser = new Student(0, username, password, new int[0]); // if something breaks it might be this
+                newUser = new Student(username, password);
                 Log.d("sysout", "creating student");
             }
 

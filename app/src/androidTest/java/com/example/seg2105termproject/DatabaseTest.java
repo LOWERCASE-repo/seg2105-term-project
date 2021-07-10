@@ -60,7 +60,7 @@ public class DatabaseTest {
 
         Admin admin = new Admin(1, name1, "admin123");
         Instructor tony = new Instructor(2, name2, "regexFile");
-        Student subaru = new Student(3, name3, "quack", new int[0]);
+        Student subaru = new Student(3, name3, "quack");
 
         dbHelper.addUser(admin);
         dbHelper.addUser(tony);
@@ -81,31 +81,6 @@ public class DatabaseTest {
     }
 
     @Test
-    public void testGetEnrolledCourses(){
-        String name = "Jimmy";
-        String password = "1234";
-        int[] courseIds = {1,2,3,4};
-        Course[] courses = {
-                new Course(1, "N1", "C1"),
-                new Course(2, "N2", "C2"),
-                new Course(3, "N3", "C3"),
-                new Course(4, "N4", "C4")
-        };
-
-        for (Course course : courses){
-            dbHelper.addCourse(course);
-        }
-
-        Student jimmy = new Student(0, name, password, courseIds);
-        dbHelper.addUser(jimmy);
-
-        // Check getEnrolledCourse
-        Course[] result = dbHelper.getEnrolledCourses(name);
-
-        assertArrayEquals(courses, result);
-    }
-
-    @Test
     public void testEditEnrolledCourses(){
         String name = "Jimmy";
         String password = "1234";
@@ -122,33 +97,41 @@ public class DatabaseTest {
             dbHelper.addCourse(course);
         }
 
-        Student jimmy = new Student(0, name, password, courseIds);
+        Student jimmy = new Student(1, name, password);
 
         dbHelper.addUser(jimmy);
 
+        // Get database id of jimmy.
+        Student jimmyData = (Student) dbHelper.getUser(name);
+        int id = jimmyData.getId();
+
         // Try addEnrolledCourse
-        dbHelper.addEnrolledCourse(name, courses[1].getId());
-        Course[] result1 = dbHelper.getEnrolledCourses(name);
-        Course[] expected1 = {courses[0], courses[1], courses[2], courses[3], courses[4]};
+        dbHelper.addEnrolledCourse(id, courses[0].getId());
+        dbHelper.addEnrolledCourse(id, courses[1].getId());
+        dbHelper.addEnrolledCourse(id, courses[3].getId());
+
+        Course[] result1 = dbHelper.getEnrolledCourses(id);
+        Course[] expected1 = {courses[0], courses[1], courses[3]};
 
         assertArrayEquals(expected1, result1);
-        assertTrue(dbHelper.checkEnrolled(name, 1));
-        assertTrue(dbHelper.checkEnrolled(name, 2));
-        assertTrue(dbHelper.checkEnrolled(name, 3));
-        assertTrue(dbHelper.checkEnrolled(name, 4));
-        assertTrue(dbHelper.checkEnrolled(name, 5));
+        assertTrue(dbHelper.checkEnrolled(id, 1));
+        assertTrue(dbHelper.checkEnrolled(id, 2));
+        assertFalse(dbHelper.checkEnrolled(id, 3));
+        assertTrue(dbHelper.checkEnrolled(id, 4));
+        assertFalse(dbHelper.checkEnrolled(id, 5));
 
         // Try removeEnrolledCourse
-        dbHelper.removeEnrolledCourse(name, courses[3].getId());
-        Course[] result2 = dbHelper.getEnrolledCourses(name);
-        Course[] expected2 = {courses[0], courses[1], courses[2], courses[4]};
+        dbHelper.removeEnrolledCourse(id, courses[1].getId());
+
+        Course[] result2 = dbHelper.getEnrolledCourses(jimmy.getId());
+        Course[] expected2 = {courses[0], courses[3]};
 
         assertArrayEquals(expected2, result2);
-        assertTrue(dbHelper.checkEnrolled(name, 1));
-        assertTrue(dbHelper.checkEnrolled(name, 2));
-        assertTrue(dbHelper.checkEnrolled(name, 3));
-        assertFalse(dbHelper.checkEnrolled(name, 4));
-        assertTrue(dbHelper.checkEnrolled(name, 5));
+        assertTrue(dbHelper.checkEnrolled(id, 1));
+        assertFalse(dbHelper.checkEnrolled(id, 2));
+        assertFalse(dbHelper.checkEnrolled(id, 3));
+        assertTrue(dbHelper.checkEnrolled(id, 4));
+        assertFalse(dbHelper.checkEnrolled(id, 5));
     }
 
 
@@ -174,16 +157,20 @@ public class DatabaseTest {
     public void testDeleteCourse(){
         String code1 = "SEG 2105";
         String code2 = "BIO 8008";
+        String code3 = "KAKA";
         Course test1 = new Course(1,"Software Engineering", code1);
         Course test2 = new Course(2, "Biology", code2);
+        Course test3 = new Course(3, "Ka Ka", code3);
         Student[] students = {
-                new Student(1, "Billy", "fart", new int[]{1,3,5,7}),
-                new Student(2, "Andrew", "bananas", new int[]{30,26,52,1,40}),
-                new Student(3, "Enigma", "edgykid", new int[]{3,101})
+                new Student(1, "Billy", "fart"),
+                new Student(2, "Andrew", "bananas"),
+                new Student(3, "Enigma", "edgykid")
         };
 
         for (Student student : students){
             dbHelper.addUser(student);
+            dbHelper.addEnrolledCourse(student.getId(), 1);
+            dbHelper.addEnrolledCourse(student.getId(), 3);
         }
 
         dbHelper.addCourse(test1);
@@ -198,11 +185,10 @@ public class DatabaseTest {
 
         }
 
-        // Ensure the course id is removed from the enrolled students.
-        User[] users = dbHelper.getAllUsers();
-        assertArrayEquals(new int[]{3,5,7}, users[0].getEnrolledCourses());
-        assertArrayEquals(new int[]{30,26,52,40}, users[1].getEnrolledCourses());
-        assertArrayEquals(new int[]{3,101}, users[2].getEnrolledCourses());
+        for (Student student : students){
+            assertFalse(dbHelper.checkEnrolled(student.getId(), 1));
+            assertTrue(dbHelper.checkEnrolled(student.getId(), 3));
+        }
     }
 
     @Test
@@ -239,7 +225,7 @@ public class DatabaseTest {
     public void testChangeCourseInstructor(){
         String name = "Math";
         String code = "MAT 1341";
-        Course test = new Course(
+        Course test = new Course(1,
                 name,
                 code,
                 new Instructor("Mr. CRR", "password"),
@@ -248,10 +234,24 @@ public class DatabaseTest {
                 new LocalTime[]{LocalTime.of(19, 0)},
                 "Linear Algebra",
                 110);
+        Student[] students = {
+                new Student(1, "Billy", "fart"),
+                new Student(2, "Andrew", "bananas"),
+                new Student(3, "Enigma", "edgykid")
+        };
 
         dbHelper.addCourse(test);
+
+        for (Student student : students){
+            dbHelper.addEnrolledCourse(student.getId(), 1);
+        }
+
         dbHelper.changeCourseInstructor(code, null);
         assertEquals(new Course(name, code, null, new DayOfWeek[0], new LocalTime[0], new LocalTime[0], "", 0), dbHelper.getCourse(code));
+
+        for (Student student : students){
+            assertFalse(dbHelper.checkEnrolled(student.getId(), 1));
+        }
 
         Instructor i = new Instructor("John", "fatty");
         dbHelper.addUser(i);

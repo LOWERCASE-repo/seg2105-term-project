@@ -13,22 +13,12 @@ package com.example.seg2105termproject;
 */
 public class Student extends User{
 
-    public Student (int id, String username, String password, int[] enrolledCourses) {
-        super(id, username, password, enrolledCourses);
+    public Student (int id, String username, String password) {
+        super(id, username, password);
     }
 
     public Student (String username, String password){
         super(username, password);
-    }
-
-    @Override
-    public int[] getEnrolledCourses() {
-        return this.enrolledCourses;
-    }
-
-    @Override
-    public void setEnrolledCourses(int[] enrolledCourses) throws UnsupportedOperationException {
-        this.enrolledCourses = enrolledCourses;
     }
 
     public UserType getType(){

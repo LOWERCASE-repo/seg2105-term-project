@@ -19,13 +19,11 @@ public abstract class User {
     private int id;
     private String username;
     private String password;
-    protected int[] enrolledCourses;
 
-    public User(int id, String username, String password, int[] enrolledCourses){
+    public User(int id, String username, String password){
         this.id = id;
         this.username = username;
         this.password = password;
-        this.enrolledCourses = enrolledCourses;
     }
 
     public User(String username, String password){
@@ -33,15 +31,13 @@ public abstract class User {
         this.password = password;
     }
 
-    public String getUsername() {
-        return username;
-    }
+    public int getId() { return id; }
+
+    public String getUsername() { return username; }
 
     public String getPassword() {
         return password;
     }
-
-    public abstract int[] getEnrolledCourses();
 
     public void setUsername(String username) {
         this.username = username;
@@ -50,8 +46,6 @@ public abstract class User {
     public void setPassword(String password) {
         this.password = password;
     }
-
-    public abstract void setEnrolledCourses(int[] enrolledCourses);
 
     public abstract UserType getType();
 
@@ -64,7 +58,7 @@ public abstract class User {
         boolean b = this.id == user.id &&
                 this.getType().equals(user.getType());
 
-        if (this.password == null){
+        if (this.username == null){
             b = b && user.username == null;
         } else {
             b = b && this.username.equals(user.username);
@@ -74,12 +68,6 @@ public abstract class User {
             b = b && user.password == null;
         } else {
             b = b && this.password.equals(user.password);
-        }
-
-        if (this.enrolledCourses == null){
-            b = b && user.enrolledCourses == null;
-        } else {
-            b = b && Arrays.equals(this.enrolledCourses, user.enrolledCourses);
         }
 
         return b;
