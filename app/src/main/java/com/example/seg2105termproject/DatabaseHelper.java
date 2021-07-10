@@ -1099,14 +1099,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /**
      * Returns an array of courses the passed Student is enrolled to in order of
      * ascending course id.
-     * @param userId    The username of the Student.
+     * @param userId    The id of the Student.
      * @return  The array of courses the passed Student is enrolled to.
-     * @throws IllegalArgumentException if the student was not found, or an enrolled course was
-     *                                  not found.
      */
-    public Course[] getEnrolledCourses(int userId) throws IllegalArgumentException{
-        // Get reference to writable database (is writable for cleaning course ids).
-        SQLiteDatabase db = this.getWritableDatabase();
+    public Course[] getEnrolledCourses(int userId){
+        // Get reference to readable database.
+        SQLiteDatabase db = this.getReadableDatabase();
 
         // Create cursor object with query.
         Cursor cursor = db.query(
@@ -1167,6 +1165,77 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Return the array of enrolled courses.
         return enrolledCourses;
+    }
+
+    /**
+     * Returns an array of students that are enrolled to the passed Course in order of
+     * ascending student id.
+     * @param courseId    The id of the Course.
+     * @return  The array of courses the passed Student is enrolled to.
+     */
+    public User[] getEnrolledStudents(int courseId){
+        // Get reference to readable database.
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Create cursor object with query.
+        Cursor cursor = db.query(
+                Enrollment.TABLE_NAME,
+                new String[]{Enrollment.COLUMN_STUDENT_ID},
+                Enrollment.COLUMN_COURSE_ID + " = ?",
+                new String[]{Integer.toString(courseId)},
+                null,
+                null,
+                Enrollment.COLUMN_STUDENT_ID + " ASC");
+
+        // Instantiate array to hold integer strings.
+        String[] strUserIds = new String[cursor.getCount()];
+        int i = 0;
+
+        // In the meantime, the SQL WHERE clauses need to be constructed as well, with one
+        // ? per course id.
+        StringBuilder whereStatement = new StringBuilder();
+        whereStatement.append(CourseTable._ID);
+        whereStatement.append(" IN (");
+
+        // For each course id,
+        while(cursor.moveToNext()){
+            // Save it into the array.
+            strUserIds[i++] = cursor.getString(0);
+
+            // Append a ? to the WHERE clause.
+            whereStatement.append("?");
+
+            // Do not add a comma for the last course id.
+            if (!cursor.isLast()) whereStatement.append(",");
+        }
+
+        // Finish off the bracket.
+        whereStatement.append(")");
+
+        Cursor userCursor = db.query(
+                Accounts.TABLE_NAME,
+                null,               // Will pass all columns.
+                whereStatement.toString(),
+                strUserIds,
+                null,
+                null,
+                Accounts._ID + " ASC"
+        );
+
+        User[] enrolledStudents = new User[userCursor.getCount()];
+        int j = 0;
+        // If courses of the ids were found in the database,
+        while (userCursor.moveToNext()){
+            enrolledStudents[j++] = constructUserSubclass(userCursor);
+        }
+
+        // Close the database and cursors.
+        db.close();
+        cursor.close();
+        userCursor.close();
+
+        // Return the array of enrolled courses.
+        return enrolledStudents;
     }
 
     /**

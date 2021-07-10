@@ -166,7 +166,7 @@ public class Course {
             this.days = new DayOfWeek[0];
             this.startTimes = new LocalTime[0];
             this.endTimes = new LocalTime[0];
-            this.description = null;
+            this.description = "";
             this.capacity = 0;
         }
         this.instructor = instructor;

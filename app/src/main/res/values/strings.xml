@@ -67,9 +67,10 @@
     <string name="all_courses_label">All Courses:</string>
     <string name="selected_course_label">Selected Course:</string>
     <string name="assigned_instructor_label">Assigned Instructor:</string>
-
     <string name="capacity_label">Capacity:</string>
     <string name="description_label">Description:</string>
+    <string name="enrolled_students_label">Enrolled Students:</string>
+
 
     <string name="enrolled_courses_label">Enrolled Courses:</string>
 

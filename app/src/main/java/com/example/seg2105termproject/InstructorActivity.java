@@ -36,8 +36,9 @@ public class InstructorActivity extends AppCompatActivity {
     Instructor instructor;
     Course course;
 
-    RecyclerView instructorCoursesView;
+    RecyclerView instructorCoursesView, enrolledStudentsView;
     CoursesViewAdapter cAdapter;
+    UsersViewAdapter uAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +52,7 @@ public class InstructorActivity extends AppCompatActivity {
         editCapacity = findViewById(R.id.editCapacity);
         editDescription = findViewById(R.id.editDescription);
         instructorCoursesView = findViewById(R.id.instructorCoursesView);
+        enrolledStudentsView = findViewById(R.id.enrolledStudentsView);
 
         DatabaseHelper dbHelper = new DatabaseHelper(this);
 
@@ -58,6 +60,11 @@ public class InstructorActivity extends AppCompatActivity {
         LinearLayoutManager coursesLayoutManager = new LinearLayoutManager(this);
         instructorCoursesView.setLayoutManager(coursesLayoutManager);
         instructorCoursesView.setAdapter(cAdapter);
+
+        uAdapter = new UsersViewAdapter(new User[0]);
+        LinearLayoutManager usersLayoutManager = new LinearLayoutManager(this);
+        enrolledStudentsView.setLayoutManager(usersLayoutManager);
+        enrolledStudentsView.setAdapter(uAdapter);
 
         Intent intent = getIntent();
         instructor = (Instructor) dbHelper.getUser(intent.getStringExtra(MainActivity.EXTRA_USER));
@@ -93,6 +100,7 @@ public class InstructorActivity extends AppCompatActivity {
 
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         cAdapter.refresh(dbHelper.getAllCourses());
+        uAdapter.refresh(dbHelper.getEnrolledStudents(course.getId()));
     }
 
     /**

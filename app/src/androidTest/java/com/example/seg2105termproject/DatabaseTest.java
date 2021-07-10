@@ -81,10 +81,12 @@ public class DatabaseTest {
     }
 
     @Test
-    public void testEditEnrolledCourses(){
-        String name = "Jimmy";
-        String password = "1234";
-        int[] courseIds = {1,3,4,5};
+    public void testEnrollment(){
+        Student[] students = {
+                new Student(1, "Billy", "fart"),
+                new Student(2, "Andrew", "bananas"),
+                new Student(3, "Enigma", "edgykid")
+        };
         Course[] courses = {
                 new Course(1, "Math", "MAT 1341"),
                 new Course(2, "English", "ENG 1001"),
@@ -93,45 +95,61 @@ public class DatabaseTest {
                 new Course(5, "Physics", "PHY 1321")
         };
 
+        for (Student student : students){
+            dbHelper.addUser(student);
+        }
+
         for (Course course : courses){
             dbHelper.addCourse(course);
         }
 
-        Student jimmy = new Student(1, name, password);
-
-        dbHelper.addUser(jimmy);
-
-        // Get database id of jimmy.
-        Student jimmyData = (Student) dbHelper.getUser(name);
-        int id = jimmyData.getId();
-
-        // Try addEnrolledCourse
-        dbHelper.addEnrolledCourse(id, courses[0].getId());
-        dbHelper.addEnrolledCourse(id, courses[1].getId());
-        dbHelper.addEnrolledCourse(id, courses[3].getId());
-
-        Course[] result1 = dbHelper.getEnrolledCourses(id);
-        Course[] expected1 = {courses[0], courses[1], courses[3]};
+        // Try getEnrolledCourses on no enrollments
+        Course[] result1 = dbHelper.getEnrolledCourses(1);
+        Course[] expected1 = new Course[0];
 
         assertArrayEquals(expected1, result1);
-        assertTrue(dbHelper.checkEnrolled(id, 1));
-        assertTrue(dbHelper.checkEnrolled(id, 2));
-        assertFalse(dbHelper.checkEnrolled(id, 3));
-        assertTrue(dbHelper.checkEnrolled(id, 4));
-        assertFalse(dbHelper.checkEnrolled(id, 5));
+
+        // Try addEnrolledCourse
+        for (Student student : students){
+            if (student.getId() != 2) {
+                dbHelper.addEnrolledCourse(student.getId(), 2);
+                dbHelper.addEnrolledCourse(student.getId(), 1);
+                dbHelper.addEnrolledCourse(student.getId(), 4);
+            }
+        }
+
+        Course[] result2a = dbHelper.getEnrolledCourses(1);
+        Course[] expected2a = {courses[0], courses[1], courses[3]};
+
+        User[] result2b = dbHelper.getEnrolledStudents(1);
+        User[] expected2b = {students[0], students[2]};
+
+        assertArrayEquals(expected2a, result2a);
+        assertArrayEquals(expected2b, result2b);
+
+        assertTrue(dbHelper.checkEnrolled(1, 1));
+        assertTrue(dbHelper.checkEnrolled(1, 2));
+        assertFalse(dbHelper.checkEnrolled(1, 3));
+        assertTrue(dbHelper.checkEnrolled(1, 4));
+        assertFalse(dbHelper.checkEnrolled(1, 5));
 
         // Try removeEnrolledCourse
-        dbHelper.removeEnrolledCourse(id, courses[1].getId());
+        dbHelper.removeEnrolledCourse(1, 2);
 
-        Course[] result2 = dbHelper.getEnrolledCourses(jimmy.getId());
-        Course[] expected2 = {courses[0], courses[3]};
+        Course[] result3a = dbHelper.getEnrolledCourses(1);
+        Course[] expected3a = {courses[0], courses[3]};
 
-        assertArrayEquals(expected2, result2);
-        assertTrue(dbHelper.checkEnrolled(id, 1));
-        assertFalse(dbHelper.checkEnrolled(id, 2));
-        assertFalse(dbHelper.checkEnrolled(id, 3));
-        assertTrue(dbHelper.checkEnrolled(id, 4));
-        assertFalse(dbHelper.checkEnrolled(id, 5));
+        User[] result3b = dbHelper.getEnrolledStudents(2);
+        User[] expected3b = {students[2]};
+
+        assertArrayEquals(expected3a, result3a);
+        assertArrayEquals(expected3b, result3b);
+
+        assertTrue(dbHelper.checkEnrolled(1, 1));
+        assertFalse(dbHelper.checkEnrolled(1, 2));
+        assertFalse(dbHelper.checkEnrolled(1, 3));
+        assertTrue(dbHelper.checkEnrolled(1, 4));
+        assertFalse(dbHelper.checkEnrolled(1, 5));
     }
 
 
