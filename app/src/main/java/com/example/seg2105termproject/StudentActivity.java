@@ -269,8 +269,11 @@ public class StudentActivity extends AppCompatActivity {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
 
         if (!dbHelper.checkEnrolled(student.getUsername(), course.getId())) {
-
-            dbHelper.addEnrolledCourse(student.getUsername(), course.getId());
+            try {
+                dbHelper.addEnrolledCourse(student.getUsername(), course.getId());
+            } catch (IllegalArgumentException e) {
+                Utils.createErrorDialog(self, R.string.timeslot_conflict);
+            }
             update(course);
 
         } else {

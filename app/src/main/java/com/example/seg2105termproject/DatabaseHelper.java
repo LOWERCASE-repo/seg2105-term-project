@@ -314,6 +314,105 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * @param username The student adding the course
+     * @param courseId The id of the course being added
+     * @return whether the timeslots of the given course conflicts with any other in the given
+     * students enrolled courses
+     */
+    public boolean timeSlotConflicts(String username, int courseId) {
+
+        // Get reference to writable database.
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor cursor = db.query(
+                Accounts.TABLE_NAME,
+                new String[]{Accounts.COLUMN_USER_TYPE, Accounts.COLUMN_ENROLLED_COURSES},
+                Accounts.COLUMN_USERNAME + " = ?",
+                new String[]{username},
+                null,
+                null,
+                null);
+
+        // If student not found, throw exception.
+        if (!cursor.moveToFirst()) {
+            throwExceptionAndClose(db, cursor, new IllegalArgumentException());
+        }
+
+        // Check if the UserType of the passed user(name) is of STUDENT.
+        UserType type = UserType.valueOf(cursor.getString(0));
+        if (type != UserType.STUDENT) {
+            throwExceptionAndClose(db, cursor, new IllegalArgumentException("Passed user is not a Student"));
+        }
+
+        int[] courses = Utils.parseIntArray(cursor.getString(1));
+
+        cursor.close();
+        cursor = db.query(
+                CourseTable.TABLE_NAME,
+                new String[]{
+                        CourseTable.COLUMN_COURSE_DAYS,
+                        CourseTable.COLUMN_COURSE_START_TIMES,
+                        CourseTable.COLUMN_COURSE_END_TIMES},
+                CourseTable._ID + " = ?",
+                new String[]{String.valueOf(courseId)},
+                null,
+                null,
+                null
+        );
+
+        // If course not found, throw exception.
+        if (!cursor.moveToFirst()) {
+            throwExceptionAndClose(db, cursor, new IllegalArgumentException());
+        }
+
+        // Create arrays of the old time values.
+        DayOfWeek[] addedDaysArray = Utils.parseDays(cursor.getString(0));
+        LocalTime[] addedStartTimesArray = Utils.parseTimes(cursor.getString(1));
+        LocalTime[] addedEndTimesArray = Utils.parseTimes(cursor.getString(2));
+        cursor.close();
+
+        for (int course : courses) {
+            Cursor courseCursor = db.query(
+                    CourseTable.TABLE_NAME,
+                    new String[]{
+                            CourseTable.COLUMN_COURSE_DAYS,
+                            CourseTable.COLUMN_COURSE_START_TIMES,
+                            CourseTable.COLUMN_COURSE_END_TIMES},
+                    CourseTable._ID + " = ?",
+                    new String[]{String.valueOf(course)},
+                    null,
+                    null,
+                    null
+            );
+            // If student not found, throw exception.
+            if (!courseCursor.moveToFirst()) {
+                throwExceptionAndClose(db, cursor, new IllegalArgumentException());
+            }
+
+            // Create arrays of the old time values.
+            DayOfWeek[] daysArray = Utils.parseDays(courseCursor.getString(0));
+            LocalTime[] startTimesArray = Utils.parseTimes(courseCursor.getString(1));
+            LocalTime[] endTimesArray = Utils.parseTimes(courseCursor.getString(2));
+
+            for(int i=0; i<daysArray.length; i++) {
+                for(int j=0; j<addedDaysArray.length; j++){
+                    if (daysArray[i] != addedDaysArray[j]) continue;
+
+                    if (!(addedStartTimesArray[i].compareTo(endTimesArray[j]) >= 0) &&
+                        !(addedEndTimesArray[i].compareTo(startTimesArray[j]) <= 0)) {
+                        courseCursor.close();
+                        db.close();
+                        return true;
+                    }
+                }
+            }
+            courseCursor.close();
+        }
+        db.close();
+        return false;
+    }
+
+    /**
      * Adds a course to a Student's enrolled courses attribute.
      * @param username  The username of the student, enrolling to a course.
      * @param targetId  The id of the course the student is enrolling to.
@@ -322,6 +421,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void addEnrolledCourse(String username, int targetId) throws IllegalArgumentException {
 
+        if (timeSlotConflicts(username, targetId)) {
+            throw new IllegalArgumentException("Could not add course due to timeslot conflict.");
+        }
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
 
