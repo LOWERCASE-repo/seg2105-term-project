@@ -86,12 +86,18 @@ public class EditTimeslotActivity extends AppCompatActivity {
      */
     public void saveTimeslot(View view){
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        dbHelper.changeCourseTime(courseCode, position,
-                DayOfWeek.valueOf(spinnerDaySelect.getSelectedItem().toString().toUpperCase()),
-                LocalTime.of(tpStart.getHour(), tpStart.getMinute()),
-                LocalTime.of(tpEnd.getHour(), tpEnd.getMinute()));
-        TimetableActivity.self.update();
-        finish();
+        if (LocalTime.of(tpStart.getHour(), tpStart.getMinute())
+                .compareTo(LocalTime.of(tpEnd.getHour(), tpEnd.getMinute())) >= 0) {
+            Utils.createErrorDialog(this, R.string.timeslot_end_start_time);
+        }
+        else {
+            dbHelper.changeCourseTime(courseCode, position,
+                    DayOfWeek.valueOf(spinnerDaySelect.getSelectedItem().toString().toUpperCase()),
+                    LocalTime.of(tpStart.getHour(), tpStart.getMinute()),
+                    LocalTime.of(tpEnd.getHour(), tpEnd.getMinute()));
+            TimetableActivity.self.update();
+            finish();
+        }
     }
 
     /**

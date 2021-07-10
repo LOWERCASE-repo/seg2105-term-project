@@ -99,6 +99,7 @@
     <string name="timeslot_not_found">No timeslot was selected.\nThis error is not supposed to occur during natural runtime...</string>
     <string name="no_courses_on_day">No courses are active on the selected day.</string>
     <string name="timeslot_conflict">Could not enrol in course:\nThere was a timetable conflict with another enrolled course</string>
+    <string name="timeslot_end_start_time">Start time needs to be before end time.</string>
 
     <string name="enrolled">Enrolled.</string>
     <string name="unenrolled">Unenrolled.</string>
