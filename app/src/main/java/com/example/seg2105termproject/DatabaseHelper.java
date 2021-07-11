@@ -12,6 +12,7 @@ import android.util.Log;
 import java.lang.reflect.Array;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.ArrayList;
 
 /**
  * This file is part of Course Booking application for Android devices
@@ -323,26 +324,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         Cursor cursor = db.query(
-                Accounts.TABLE_NAME,
-                new String[]{Accounts.COLUMN_USER_TYPE, Accounts.COLUMN_ENROLLED_COURSES},
-                Accounts.COLUMN_USERNAME + " = ?",
-                new String[]{username},
+                Enrollment.TABLE_NAME,
+                new String[]{Enrollment.COLUMN_COURSE_ID},
+                Enrollment.COLUMN_STUDENT_ID + " = ?",
+                new String[]{String.valueOf(userId)},
                 null,
                 null,
                 null);
 
-        // If student not found, throw exception.
+        // If student is not enrolled in any classes, return false.
         if (!cursor.moveToFirst()) {
-            throwExceptionAndClose(db, cursor, new IllegalArgumentException());
+            return false;
         }
 
-        // Check if the UserType of the passed user(name) is of STUDENT.
-        UserType type = UserType.valueOf(cursor.getString(0));
-        if (type != UserType.STUDENT) {
-            throwExceptionAndClose(db, cursor, new IllegalArgumentException("Passed user is not a Student"));
-        }
+        ArrayList<Integer> courses = new ArrayList<>();
 
-        int[] courses = Utils.parseIntArray(cursor.getString(1));
+        while (!cursor.isAfterLast()) {
+            courses.add(cursor.getInt(0));
+            cursor.moveToNext();
+        }
 
         cursor.close();
         cursor = db.query(
@@ -392,9 +392,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             LocalTime[] startTimesArray = Utils.parseTimes(courseCursor.getString(1));
             LocalTime[] endTimesArray = Utils.parseTimes(courseCursor.getString(2));
 
-            for(int i=0; i<daysArray.length; i++) {
-                for(int j=0; j<addedDaysArray.length; j++){
-                    if (daysArray[i] != addedDaysArray[j]) continue;
+            for(int i=0; i<addedDaysArray.length; i++) {
+                for(int j=0; j<daysArray.length; j++){
+                    if (addedDaysArray[i] != daysArray[j]) continue;
 
                     if (!(addedStartTimesArray[i].compareTo(endTimesArray[j]) >= 0) &&
                         !(addedEndTimesArray[i].compareTo(startTimesArray[j]) <= 0)) {
