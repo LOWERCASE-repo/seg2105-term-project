@@ -38,6 +38,6 @@ A student can:
  
  Authors:
  *              Sally R       <@uottawa.ca> 
- *              Jerry S       <@uottawa.ca>
+ *              Jerry S       <jsoon029@uottawa.ca>
  *              Glen W        <@uottawa.ca>
  *              Youssef J     <yjall032@uottawa.ca>
