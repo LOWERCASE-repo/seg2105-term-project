@@ -85,9 +85,14 @@ public class DatabaseTest {
         Instructor tony = new Instructor(2, name2, "regexFile");
         Student subaru = new Student(3, name3, "quack");
 
+        Course test = new Course("Test", "TST 404");
+
         dbHelper.addUser(admin);
         dbHelper.addUser(tony);
         dbHelper.addUser(subaru);
+        dbHelper.addCourse(test);
+
+        dbHelper.addEnrolledCourse(3, 1);
 
         dbHelper.deleteUser(name2);
         dbHelper.deleteUser(name3);
@@ -109,6 +114,8 @@ public class DatabaseTest {
         } catch (IllegalArgumentException e){
 
         }
+
+        assertFalse(dbHelper.checkEnrolled(3, 1));
     }
 
     // Enrollment-related tests.
