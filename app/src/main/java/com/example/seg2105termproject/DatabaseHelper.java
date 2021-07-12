@@ -231,13 +231,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Get reference to writable database.
         SQLiteDatabase db = this.getWritableDatabase();
 
+        // Create the selection and corresponding selectionArgs string(s).
+        String selection = Accounts.COLUMN_USERNAME + " LIKE ?";
         String[] selectionArgs = {username};
 
-        // Query the database to delete the User.
-        int result = db.delete(
+        // Query the database. Get the cursor object pointing to the user id.
+        Cursor cursor = db.query(
                 Accounts.TABLE_NAME,
-                Accounts.COLUMN_USERNAME + " LIKE ?",
-                selectionArgs);
+                new String[]{Accounts._ID},
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+        );
+
+        // If user not found, throw exception.
+        if (!cursor.moveToFirst()) throwExceptionAndClose(db, cursor, new IllegalArgumentException());
 
         // Delete the course details of courses the instructor was teaching.
         // Does not affect any course if a Student is deleted, since all usernames are unique.
@@ -256,11 +266,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 new String[]{username}
         );
 
-        // Regardless of success or not, close the database.
-        db.close();
+        // Create the selection and corresponding selectionArgs string(s) for enrollment deletion.
+        String idSelection = Enrollment.COLUMN_STUDENT_ID + " = ?";
+        String[] idSelectionArgs = {cursor.getString(0)};
 
-        // if we didn't modify any rows, show error message
-        if (result == 0) throw new IllegalArgumentException();
+        // Delete enrollments to courses. Will not have any effect if user is not a student,
+        // since there will be no user id in the Enrollment table if the user was not a
+        // student in the first place.
+        db.delete(
+                Enrollment.TABLE_NAME,
+                idSelection,
+                idSelectionArgs
+        );
+
+        // Delete the user.
+        db.delete(
+                Accounts.TABLE_NAME,
+                selection,
+                selectionArgs
+        );
+
+        // Close the database and cursor.
+        db.close();
+        cursor.close();
     }
 
     /**
@@ -277,7 +305,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String selection = CourseTable.COLUMN_COURSE_CODE + " LIKE ?";
         String[] selectionArgs = {courseCode};
 
-        // Query the database. Get the cursor object pointing to the course.
+        // Query the database. Get the cursor object pointing to the course id.
         Cursor cursor = db.query(
                 CourseTable.TABLE_NAME,
                 new String[]{CourseTable._ID},
@@ -307,7 +335,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 selection,
                 selectionArgs);
 
-        // Regardless of success or not, close the database.
+        // Close the database and cursor.
         db.close();
         cursor.close();
     }

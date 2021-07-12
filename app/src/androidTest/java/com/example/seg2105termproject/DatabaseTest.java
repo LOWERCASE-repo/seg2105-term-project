@@ -77,81 +77,182 @@ public class DatabaseTest {
 
     @Test
     public void testDeleteUser(){
-        // TODO: Create test.
+        String name1 = "admin";
+        String name2 = "Tony";
+        String name3 = "Subaru";
+
+        Admin admin = new Admin(1, name1, "admin123");
+        Instructor tony = new Instructor(2, name2, "regexFile");
+        Student subaru = new Student(3, name3, "quack");
+
+        Course test = new Course("Test", "TST 404");
+
+        dbHelper.addUser(admin);
+        dbHelper.addUser(tony);
+        dbHelper.addUser(subaru);
+        dbHelper.addCourse(test);
+
+        dbHelper.addEnrolledCourse(3, 1);
+
+        dbHelper.deleteUser(name2);
+        dbHelper.deleteUser(name3);
+
+        User u1 = dbHelper.getUser(name1);
+
+        assertEquals(admin, u1);
+
+        try {
+            dbHelper.getUser(name2);
+            fail();
+        } catch (IllegalArgumentException e){
+
+        }
+
+        try {
+            dbHelper.getUser(name3);
+            fail();
+        } catch (IllegalArgumentException e){
+
+        }
+
+        assertFalse(dbHelper.checkEnrolled(3, 1));
+    }
+
+    // Enrollment-related tests.
+    @Test
+    public void testAddEnrolledCourse(){
+        Student jimmy = new Student(1, "Jimmy", "123");
+        Course math = new Course(1, "Math", "MAT 1341");
+
+        dbHelper.addUser(jimmy);
+        dbHelper.addCourse(math);
+
+        assertFalse(dbHelper.checkEnrolled(1, 1));
+
+        dbHelper.addEnrolledCourse(1, 1);
+
+        assertTrue(dbHelper.checkEnrolled(1, 1));
     }
 
     @Test
-    public void testEnrollment(){
-        Student[] students = {
-                new Student(1, "Billy", "fart"),
-                new Student(2, "Andrew", "bananas"),
-                new Student(3, "Enigma", "edgykid")
-        };
-        Course[] courses = {
-                new Course(1, "Math", "MAT 1341"),
-                new Course(2, "English", "ENG 1001"),
-                new Course(3, "Intro to Python", "ITI 1120"),
-                new Course(4, "Digital Systems", "ITI 1100"),
-                new Course(5, "Physics", "PHY 1321")
-        };
+    public void testRemoveEnrolledCourse(){
+        Student jimmy = new Student(1, "Jimmy", "123");
+        Course math = new Course(1, "Math", "MAT 1341");
+        Course bio = new Course(2, "Biology", "BIO 2432");
 
-        for (Student student : students){
-            dbHelper.addUser(student);
-        }
+        dbHelper.addUser(jimmy);
+        dbHelper.addCourse(math);
+        dbHelper.addCourse(bio);
 
-        for (Course course : courses){
-            dbHelper.addCourse(course);
-        }
-
-        // Try getEnrolledCourses on no enrollments
-        Course[] result1 = dbHelper.getEnrolledCourses(1);
-        Course[] expected1 = new Course[0];
-
-        assertArrayEquals(expected1, result1);
-
-        // Try addEnrolledCourse
-        for (Student student : students){
-            if (student.getId() != 2) {
-                dbHelper.addEnrolledCourse(student.getId(), 2);
-                dbHelper.addEnrolledCourse(student.getId(), 1);
-                dbHelper.addEnrolledCourse(student.getId(), 4);
-            }
-        }
-
-        Course[] result2a = dbHelper.getEnrolledCourses(1);
-        Course[] expected2a = {courses[0], courses[1], courses[3]};
-
-        User[] result2b = dbHelper.getEnrolledStudents(1);
-        User[] expected2b = {students[0], students[2]};
-
-        assertArrayEquals(expected2a, result2a);
-        assertArrayEquals(expected2b, result2b);
+        dbHelper.addEnrolledCourse(1, 1);
+        dbHelper.addEnrolledCourse(1, 2);
 
         assertTrue(dbHelper.checkEnrolled(1, 1));
         assertTrue(dbHelper.checkEnrolled(1, 2));
-        assertFalse(dbHelper.checkEnrolled(1, 3));
-        assertTrue(dbHelper.checkEnrolled(1, 4));
-        assertFalse(dbHelper.checkEnrolled(1, 5));
 
-        // Try removeEnrolledCourse
-        dbHelper.removeEnrolledCourse(1, 2);
+        dbHelper.removeEnrolledCourse(1, 1);
 
-        Course[] result3a = dbHelper.getEnrolledCourses(1);
-        Course[] expected3a = {courses[0], courses[3]};
-
-        User[] result3b = dbHelper.getEnrolledStudents(2);
-        User[] expected3b = {students[2]};
-
-        assertArrayEquals(expected3a, result3a);
-        assertArrayEquals(expected3b, result3b);
-
-        assertTrue(dbHelper.checkEnrolled(1, 1));
-        assertFalse(dbHelper.checkEnrolled(1, 2));
-        assertFalse(dbHelper.checkEnrolled(1, 3));
-        assertTrue(dbHelper.checkEnrolled(1, 4));
-        assertFalse(dbHelper.checkEnrolled(1, 5));
+        assertFalse(dbHelper.checkEnrolled(1, 1));
     }
 
+    @Test
+    public void testGetEnrolledStudents(){
+        Student jimmy = new Student(1, "Jimmy", "123");
+        Student jenny = new Student(2, "Jenny", "321");
+        Course math = new Course(1, "Math", "MAT 1341");
+        Course bio = new Course(2, "Biology", "BIO 2432");
+
+        dbHelper.addUser(jimmy);
+        dbHelper.addUser(jenny);
+        dbHelper.addCourse(math);
+        dbHelper.addCourse(bio);
+
+        dbHelper.addEnrolledCourse(1, 1);
+        dbHelper.addEnrolledCourse(1, 2);
+        dbHelper.addEnrolledCourse(2, 1);
+
+        User[] resultUsers1 = dbHelper.getEnrolledStudents(1);
+        User[] resultUsers2 = dbHelper.getEnrolledStudents(2);
+
+        User[] expectedUsers1 = {jimmy, jenny};
+        User[] expectedUsers2 = {jimmy};
+
+        assertArrayEquals(expectedUsers1, resultUsers1);
+        assertArrayEquals(expectedUsers2, resultUsers2);
+    }
+
+    @Test
+    public void testGetEnrolledCourses() {
+        Student jimmy = new Student(1, "Jimmy", "123");
+        Student jenny = new Student(2, "Jenny", "321");
+        Course math = new Course(1, "Math", "MAT 1341");
+        Course bio = new Course(2, "Biology", "BIO 2432");
+
+        dbHelper.addUser(jimmy);
+        dbHelper.addUser(jenny);
+        dbHelper.addCourse(math);
+        dbHelper.addCourse(bio);
+
+        dbHelper.addEnrolledCourse(1, 1);
+        dbHelper.addEnrolledCourse(1, 2);
+        dbHelper.addEnrolledCourse(2, 1);
+
+        Course[] resultCourses1 = dbHelper.getEnrolledCourses(1);
+        Course[] resultCourses2 = dbHelper.getEnrolledCourses(2);
+
+        Course[] expectedCourses1 = {math, bio};
+        Course[] expectedCourses2 = {math};
+
+        assertArrayEquals(expectedCourses1, resultCourses1);
+        assertArrayEquals(expectedCourses2, resultCourses2);
+    }
+
+    @Test
+    public void testTimeSlotConflict(){
+        Student jimmy = new Student(1, "Jimmy", "123");
+        Course math = new Course(1, "Math", "MAT 1341",
+                null,
+                new DayOfWeek[]{DayOfWeek.MONDAY},
+                new LocalTime[]{LocalTime.of(8, 30)},
+                new LocalTime[]{LocalTime.of(10, 0)},
+                null, 0);
+        Course bio = new Course(2, "Biology", "BIO 2432",
+                null,
+                new DayOfWeek[]{DayOfWeek.TUESDAY},
+                new LocalTime[]{LocalTime.of(8, 45)},
+                new LocalTime[]{LocalTime.of(10, 15)},
+                null, 0);
+        Course english = new Course(3, "English", "ENG 1010",
+                null,
+                new DayOfWeek[]{DayOfWeek.MONDAY},
+                new LocalTime[]{LocalTime.of(10, 1)},
+                new LocalTime[]{LocalTime.of(12, 0)},
+                null, 0);
+        Course geo = new Course(3, "Geology", "GEO 4815",
+                null,
+                new DayOfWeek[]{DayOfWeek.MONDAY},
+                new LocalTime[]{LocalTime.of(9, 30)},
+                new LocalTime[]{LocalTime.of(11, 0)},
+                null, 0);
+
+        dbHelper.addUser(jimmy);
+        dbHelper.addCourse(math);
+        dbHelper.addCourse(bio);
+        dbHelper.addCourse(english  );
+        dbHelper.addCourse(geo);
+
+        dbHelper.addEnrolledCourse(1, 1);
+        dbHelper.addEnrolledCourse(1, 2);
+        dbHelper.addEnrolledCourse(1, 3);
+
+        // Test for proper exception throw.
+        try {
+            dbHelper.addEnrolledCourse(1, 4);
+            fail();
+        } catch (IllegalArgumentException e){
+
+        }
+    }
 
     // All Course-related database methods are below.
     @Test
@@ -185,14 +286,16 @@ public class DatabaseTest {
                 new Student(3, "Enigma", "edgykid")
         };
 
+        dbHelper.addCourse(test1);
+        dbHelper.addCourse(test2);
+        dbHelper.addCourse(test3);
+
         for (Student student : students){
             dbHelper.addUser(student);
             dbHelper.addEnrolledCourse(student.getId(), 1);
             dbHelper.addEnrolledCourse(student.getId(), 3);
         }
 
-        dbHelper.addCourse(test1);
-        dbHelper.addCourse(test2);
         dbHelper.deleteCourse(code1);   // Delete course with enrolled students.
         dbHelper.deleteCourse(code2);   // Delete course without enrolled students.
 
